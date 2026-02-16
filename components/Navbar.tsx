@@ -9,22 +9,18 @@ const Navbar: React.FC = () => {
           <div className="flex items-center">
             {/* Logo Placeholder - Replicating the Mochi logo style */}
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-[#B1EF42] rounded-lg flex items-center justify-center">
-                <div className="w-4 h-4 bg-black rounded-full" />
-              </div>
-              <span className="text-2xl font-black tracking-tighter text-white">MOCHI</span>
+              <img
+                src="https://storage.googleapis.com/msgsndr/iY80Hp6mESzg02IkqB03/media/699397c86bac2456bade8238.png"
+                alt="Sistemas con IA Logo"
+                className="w-8 h-8 object-contain"
+              />
+              <span className="text-2xl font-black tracking-tighter text-white">SISTEMAS CON IA</span>
             </div>
           </div>
-          
+
           <div className="hidden md:flex items-center space-x-6">
-            <a 
-              href="#login" 
-              className="text-sm font-medium text-white hover:text-[#B1EF42] transition-colors"
-            >
-              Log in
-            </a>
             <button className="bg-[#B1EF42] text-black px-6 py-2.5 rounded-xl text-sm font-bold hover:scale-105 transition-transform">
-              Book a demo
+              DEMO AHORA
             </button>
           </div>
 

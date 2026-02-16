@@ -10,21 +10,23 @@ const Footer: React.FC = () => {
           {/* Brand */}
           <div className="flex flex-col items-center md:items-start">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 bg-[#B1EF42] rounded-lg flex items-center justify-center">
-                <div className="w-4 h-4 bg-black rounded-full" />
-              </div>
-              <span className="text-2xl font-black tracking-tighter text-white">MOCHI</span>
+              <img
+                src="https://storage.googleapis.com/msgsndr/iY80Hp6mESzg02IkqB03/media/699397c86bac2456bade8238.png"
+                alt="Sistemas con IA Logo"
+                className="w-8 h-8 object-contain"
+              />
+              <span className="text-2xl font-black tracking-tighter text-white">SISTEMAS CON IA</span>
             </div>
             <p className="text-zinc-500 text-sm max-w-xs text-center md:text-left">
-              The First Infrastructure SaaS Built for Info Businesses Running Setter Teams.
+              La infraestructura para escalar tu negocio con IA.
             </p>
           </div>
 
           {/* Links */}
           <div className="flex gap-8">
-            <a href="#" className="text-zinc-400 hover:text-[#B1EF42] text-sm font-medium transition-colors">Terms</a>
-            <a href="#" className="text-zinc-400 hover:text-[#B1EF42] text-sm font-medium transition-colors">Privacy</a>
-            <a href="#" className="text-zinc-400 hover:text-[#B1EF42] text-sm font-medium transition-colors">Contact</a>
+            <a href="#" className="text-zinc-400 hover:text-[#B1EF42] text-sm font-medium transition-colors">Términos</a>
+            <a href="#" className="text-zinc-400 hover:text-[#B1EF42] text-sm font-medium transition-colors">Privacidad</a>
+            <a href="#" className="text-zinc-400 hover:text-[#B1EF42] text-sm font-medium transition-colors">Contacto</a>
           </div>
 
           {/* Social */}
@@ -44,7 +46,7 @@ const Footer: React.FC = () => {
         {/* Bottom Text */}
         <div className="text-center">
           <p className="text-zinc-600 text-[10px] leading-relaxed max-w-3xl mx-auto uppercase tracking-widest">
-            © 2025 Mochi L.L.C-FZ. Meydan Grandstand, 6th Floor, Meydan Road, Nad Al Sheba, Dubai, United Arab Emirates. License No: 2531534.01 | Email: hey@themochi.app
+            © 2025 Sistemas con IA L.L.C-FZ. Todos los derechos reservados. | Email: hey@sistemasconia.com
           </p>
         </div>
       </div>
