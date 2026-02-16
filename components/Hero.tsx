@@ -1,6 +1,6 @@
 
 import React from 'react';
-
+import { Link } from 'react-router-dom';
 
 const Hero: React.FC = () => {
   return (
@@ -41,9 +41,9 @@ const Hero: React.FC = () => {
 
         {/* Final CTA Area */}
         <div className="mt-16 flex flex-col items-center gap-4">
-          <button className="bg-[#B1EF42] text-black px-12 py-5 rounded-2xl text-xl font-black hover:scale-105 hover:shadow-[0_0_40px_rgba(177,239,66,0.3)] transition-all duration-300 active:scale-95">
+          <Link to="/demo" className="bg-[#B1EF42] text-black px-12 py-5 rounded-2xl text-xl font-black hover:scale-105 hover:shadow-[0_0_40px_rgba(177,239,66,0.3)] transition-all duration-300 active:scale-95">
             DEMO AHORA
-          </button>
+          </Link>
 
           <div className="flex items-center gap-3">
             <div className="flex -space-x-2">

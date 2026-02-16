@@ -26,15 +26,15 @@ const Footer: React.FC = () => {
           <div className="flex gap-8">
             <a href="#" className="text-zinc-400 hover:text-[#B1EF42] text-sm font-medium transition-colors">Términos</a>
             <a href="#" className="text-zinc-400 hover:text-[#B1EF42] text-sm font-medium transition-colors">Privacidad</a>
-            <a href="#" className="text-zinc-400 hover:text-[#B1EF42] text-sm font-medium transition-colors">Contacto</a>
+            <a href="http://wa.me/34673024992" target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-[#B1EF42] text-sm font-medium transition-colors">Contacto</a>
           </div>
 
           {/* Social */}
           <div className="flex items-center gap-4">
-            <a href="#" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-zinc-400 hover:border-[#B1EF42] hover:text-[#B1EF42] transition-all">
+            <a href="https://www.instagram.com/sistemasconia/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-zinc-400 hover:border-[#B1EF42] hover:text-[#B1EF42] transition-all">
               <Instagram size={20} />
             </a>
-            <a href="#" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-zinc-400 hover:border-[#B1EF42] hover:text-[#B1EF42] transition-all">
+            <a href="https://www.youtube.com/@danielspiri" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-zinc-400 hover:border-[#B1EF42] hover:text-[#B1EF42] transition-all">
               <Youtube size={20} />
             </a>
           </div>
