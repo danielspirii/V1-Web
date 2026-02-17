@@ -15,9 +15,8 @@ const Navbar: React.FC = () => {
               <img
                 src="https://storage.googleapis.com/msgsndr/iY80Hp6mESzg02IkqB03/media/699397c86bac2456bade8238.png"
                 alt="Sistemas con IA Logo"
-                className="w-8 h-8 object-contain"
+                className="w-10 h-10 object-contain"
               />
-              <span className="text-2xl font-black tracking-tighter text-white">SISTEMAS CON IA</span>
             </Link>
           </div>
 

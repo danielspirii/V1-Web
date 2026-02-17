@@ -12,13 +12,13 @@ const Hero: React.FC = () => {
         {/* Badge */}
         <div className="inline-flex items-center px-4 py-2 rounded-full bg-[#B1EF42]/10 border border-[#B1EF42]/20 mb-8 animate-fade-in">
           <span className="text-[#B1EF42] text-sm font-semibold tracking-wide uppercase">
-            El negocio promedio no persigue sus leads
+            EL PROMEDIO NO PERSIGUE SUS LEADS
           </span>
         </div>
 
         {/* Heading */}
         <h1 className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.1] mb-8 text-white max-w-5xl mx-auto">
-          La única herramienta que utilicé para agendar <span className="text-[#B1EF42]">+400 llamadas cualificadas</span>
+          Lo único que utilicé para agendar <span className="text-[#B1EF42]">+400 llamadas cualificadas</span>
           <br className="hidden md:block" />
           con cero esfuerzo
         </h1>
@@ -57,7 +57,7 @@ const Hero: React.FC = () => {
               ))}
             </div>
             <p className="text-zinc-500 text-sm font-medium">
-              <span className="text-[#B1EF42]">17/25 Plazas Ocupadas</span> Para {new Date().toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }).replace(/^\w/, c => c.toUpperCase())}
+              <span className="text-[#B1EF42]">17/25 Plazas Ocupadas</span> Para {new Date().toLocaleDateString('es-ES', { month: 'long' }).replace(/^\w/, c => c.toUpperCase())}
             </p>
           </div>
         </div>
