@@ -1,47 +1,644 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sistemas con IA</title>
-  <script src="https://link.msgsndr.com/js/external-tracking.js"
-    data-tracking-id="tk_5b27d1ce629f4e05b118fb84e06f5661"></script>
+  <title>Sistemas con IA — Ecosistema Comercial</title>
+
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <script src="https://fast.wistia.com/player.js" async></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cabin:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            manrope: ['Manrope','sans-serif'],
+            cabin:   ['Cabin','sans-serif'],
+            serif:   ['Instrument Serif','serif'],
+            inter:   ['Inter','sans-serif'],
+          },
+          colors: {
+            lime:   '#C8FF00',
+            limed:  '#A8D800',
+            ink:    '#0A0A0A',
+            panel:  '#111111',
+            edge:   '#1E1E1E',
+          },
+          animation: {
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4,0,0.6,1) infinite',
+          }
+        }
+      }
+    }
+  </script>
+
   <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: #000000;
-      color: #ffffff;
+    html { scroll-behavior: smooth; }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #0A0A0A; }
+    ::-webkit-scrollbar-thumb { background: #C8FF00; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #A8D800; }
+
+    .glass {
+      background: rgba(15,15,15,0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(200,255,0,0.1);
+    }
+    .glass-lime {
+      background: rgba(200,255,0,0.05);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(200,255,0,0.2);
+    }
+    .lime-glow  { box-shadow: 0 0 50px rgba(200,255,0,0.1), 0 0 100px rgba(200,255,0,0.05); }
+    .lime-glow-sm { box-shadow: 0 0 20px rgba(200,255,0,0.25); }
+    .text-glow  { text-shadow: 0 0 30px rgba(200,255,0,0.4); }
+
+    .hero-bg {
+      background:
+        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(200,255,0,0.09) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 85% 85%,  rgba(200,255,0,0.04) 0%, transparent 50%),
+        #0A0A0A;
+    }
+    .alt-bg {
+      background:
+        radial-gradient(ellipse 60% 50% at 5% 50%, rgba(200,255,0,0.04) 0%, transparent 55%),
+        #0D0D0D;
     }
 
-    .clash-display {
-      font-family: 'Inter', sans-serif;
-      /* Fallback since specific fonts need self-hosting or specific CDN */
-      font-weight: 700;
-      letter-spacing: -0.02em;
+    .serif { font-family:'Instrument Serif',serif; font-style:italic; }
+
+    .badge {
+      display:inline-flex; align-items:center; gap:6px;
+      background:rgba(200,255,0,0.07);
+      border:1px solid rgba(200,255,0,0.28);
+      color:#C8FF00;
+      font-family:'Manrope',sans-serif;
+      font-size:0.67rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+      padding:.32rem .9rem; border-radius:100px;
     }
 
-    .lime-accent {
-      color: #B1EF42;
+    .divider { height:1px; background:linear-gradient(to right,transparent,rgba(200,255,0,0.25),transparent); }
+
+    /* noise */
+    .noise::after {
+      content:''; position:absolute; inset:0; pointer-events:none; border-radius:inherit;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
     }
 
-    .bg-lime-accent {
-      background-color: #B1EF42;
+    /* buttons */
+    .btn-lime {
+      background:#C8FF00; color:#0A0A0A;
+      font-family:'Manrope',sans-serif; font-weight:800; letter-spacing:.02em;
+      transition:background .2s, transform .15s, box-shadow .2s;
+    }
+    .btn-lime:hover { background:#DAFF33; transform:translateY(-2px); box-shadow:0 8px 30px rgba(200,255,0,.25); }
+
+    .btn-outline {
+      background:transparent; color:#C8FF00;
+      border:1px solid rgba(200,255,0,.35);
+      font-family:'Manrope',sans-serif; font-weight:700;
+      transition:background .2s, border-color .2s;
+    }
+    .btn-outline:hover { background:rgba(200,255,0,.06); border-color:#C8FF00; }
+
+    /* FAQ */
+    .faq-item { border-bottom:1px solid #1E1E1E; }
+    .faq-answer { max-height:0; overflow:hidden; transition:max-height .35s ease; }
+    .faq-item.open .faq-answer { max-height:400px; }
+    .faq-icon { transition:transform .25s, color .25s; color:#555; font-size:1.4rem; line-height:1; }
+    .faq-item.open .faq-icon { transform:rotate(45deg); color:#C8FF00; }
+
+    /* step connector */
+    .step-line {
+      position:absolute; left:19px; top:44px; bottom:-32px;
+      width:1px; background:linear-gradient(to bottom,rgba(200,255,0,.35),transparent);
     }
 
-    .border-lime-accent {
-      border-color: #B1EF42;
-    }
+    /* scroll reveal */
+    .reveal { opacity:0; transform:translateY(18px); transition:opacity .55s ease, transform .55s ease; }
+    .reveal.visible { opacity:1; transform:none; }
+
+    /* hover lift */
+    .lift { transition:transform .2s, border-color .2s; }
+    .lift:hover { transform:translateY(-3px); border-color:rgba(200,255,0,.35) !important; }
+
+    /* marquee */
+    @keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+    .marquee { animation:marquee 28s linear infinite; }
+    .marquee:hover { animation-play-state:paused; }
   </style>
 </head>
 
-<body>
-  <div id="root"></div>
-  <script type="module" src="/index.tsx"></script>
-</body>
+<body class="bg-ink text-white overflow-x-hidden antialiased font-inter">
 
+
+<!-- ╔══════════════════════════════════╗
+     ║  NAVBAR                         ║
+     ╚══════════════════════════════════╝ -->
+<nav class="sticky top-0 z-50 glass border-b border-edge">
+  <div class="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
+    <span class="font-manrope font-extrabold text-sm tracking-tight">
+      <span class="text-white">Sistemas</span><span class="text-lime">conIA</span>
+    </span>
+    <a href="#cta" class="btn-lime text-xs px-4 py-2 hidden sm:inline-block">Ver el Ecosistema en vivo →</a>
+  </div>
+</nav>
+
+
+<!-- ╔══════════════════════════════════╗
+     ║  HERO                           ║
+     ╚══════════════════════════════════╝ -->
+<section class="hero-bg relative overflow-hidden noise">
+  <div class="max-w-4xl mx-auto px-6 pt-24 pb-16 text-center relative z-10">
+
+    <div class="badge mb-7">
+      <span class="w-1.5 h-1.5 rounded-full bg-lime animate-pulse-slow inline-block"></span>
+      Software Comercial con IA
+    </div>
+
+    <h1 class="font-manrope font-extrabold text-[2.8rem] md:text-[4.2rem] lg:text-[5rem] leading-[1.01] tracking-tight mb-7">
+      Tu negocio vendiendo<br>
+      <span class="text-lime text-glow serif">solo.</span><br>
+      <span class="text-white">Sin setters. Sin esperas.</span>
+    </h1>
+
+    <p class="font-inter font-light text-gray-400 text-base md:text-lg max-w-lg mx-auto leading-relaxed mb-10">
+      Un software propio que persigue, cualifica, agenda y convierte cada lead
+      por WhatsApp, Instagram, Facebook y correo —
+      <span class="text-white font-normal">sin que dediques ni un segundo</span>.
+    </p>
+
+    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+      <a href="#cta" onclick="smoothTo('cta',event)" class="btn-lime px-7 py-3.5 text-sm">Ver el Ecosistema en vivo →</a>
+      <a href="#video" onclick="smoothTo('video',event)" class="btn-outline px-7 py-3.5 text-sm">Ver resultados de clientes en vivo</a>
+    </div>
+
+  </div>
+
+  <!-- ambient blob -->
+  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] pointer-events-none"
+    style="background:radial-gradient(ellipse,rgba(200,255,0,0.07) 0%,transparent 70%);filter:blur(50px);"></div>
+</section>
+
+
+<!-- ticker -->
+<div class="overflow-hidden border-y border-edge py-3 bg-panel">
+  <div class="marquee flex gap-10 whitespace-nowrap w-max font-manrope font-semibold text-xs tracking-widest uppercase text-gray-600">
+    <span>WhatsApp</span><span class="text-lime">·</span>
+    <span>Instagram DM</span><span class="text-lime">·</span>
+    <span>Facebook</span><span class="text-lime">·</span>
+    <span>Email Marketing</span><span class="text-lime">·</span>
+    <span>Retargeting Ads</span><span class="text-lime">·</span>
+    <span>Software Propio</span><span class="text-lime">·</span>
+    <span>IA Conversacional</span><span class="text-lime">·</span>
+    <span>WhatsApp</span><span class="text-lime">·</span>
+    <span>Instagram DM</span><span class="text-lime">·</span>
+    <span>Facebook</span><span class="text-lime">·</span>
+    <span>Email Marketing</span><span class="text-lime">·</span>
+    <span>Retargeting Ads</span><span class="text-lime">·</span>
+    <span>Software Propio</span><span class="text-lime">·</span>
+    <span>IA Conversacional</span><span class="text-lime">·</span>
+  </div>
+</div>
+
+
+<!-- ╔══════════════════════════════════╗
+     ║  VIDEO                          ║
+     ╚══════════════════════════════════╝ -->
+<section id="video" class="max-w-4xl mx-auto px-6 py-20">
+  <div class="text-center mb-10 reveal">
+    <div class="badge mb-4">Mira esto primero</div>
+    <h2 class="font-manrope font-extrabold text-3xl md:text-4xl tracking-tight">
+      Cómo funciona el Ecosistema
+    </h2>
+  </div>
+
+  <div class="reveal lime-glow border border-edge overflow-hidden relative" style="border-top:2px solid #C8FF00">
+    <div class="aspect-video bg-panel flex flex-col items-center justify-center gap-4 cursor-pointer group" id="vplay">
+      <!-- ► REEMPLAZA: pon aquí tu wistia-player o iframe embed -->
+      <!-- <wistia-player media-id="TU_ID" aspect="16/9"></wistia-player> -->
+      <div class="w-20 h-20 rounded-full bg-lime flex items-center justify-center group-hover:scale-110 transition-transform lime-glow-sm"
+           onclick="document.getElementById('vplay').innerHTML='<iframe src=\'TU_URL_EMBED_AQUI\' frameborder=\'0\' allow=\'autoplay;fullscreen\' allowfullscreen style=\'position:absolute;inset:0;width:100%;height:100%;\'></iframe>'; document.getElementById('vplay').style.position='relative';">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="#0A0A0A"><path d="M8 5v14l11-7z"/></svg>
+      </div>
+      <p class="font-manrope font-semibold text-xs text-gray-500 tracking-widest uppercase">Ver presentación completa</p>
+    </div>
+  </div>
+  <p class="text-center text-gray-700 text-xs mt-3 font-inter">⏱ ~15 min · Ve el vídeo completo antes de continuar</p>
+</section>
+
+
+<!-- ╔══════════════════════════════════╗
+     ║  PAIN                           ║
+     ╚══════════════════════════════════╝ -->
+<section class="alt-bg border-t border-edge py-20">
+  <div class="max-w-5xl mx-auto px-6">
+
+    <div class="text-center mb-14 reveal">
+      <div class="badge mb-5">El problema</div>
+      <h2 class="font-manrope font-extrabold text-3xl md:text-[2.8rem] tracking-tight leading-tight">
+        ¿Cuántos leads has perdido<br>
+        <span class="text-lime serif">esta semana</span>?
+      </h2>
+      <p class="text-gray-500 mt-4 max-w-sm mx-auto font-inter font-light text-sm leading-relaxed">
+        La mayoría de negocios genera interesados pero los gestiona fatal. El dinero en anuncios no se convierte.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-3">
+      <div class="glass border border-edge p-6 lift reveal">
+        <div class="text-2xl mb-3">💸</div>
+        <h3 class="font-manrope font-bold text-white text-sm mb-2">Inversión en ads que se evapora</h3>
+        <p class="text-gray-500 text-xs font-inter font-light leading-relaxed">Generas leads a diario pero no los persigues. Tu ROI sufre y no entiendes por qué.</p>
+      </div>
+      <div class="glass border border-edge p-6 lift reveal" style="transition-delay:.06s">
+        <div class="text-2xl mb-3">⏳</div>
+        <h3 class="font-manrope font-bold text-white text-sm mb-2">Cientos de horas en gestión manual</h3>
+        <p class="text-gray-500 text-xs font-inter font-light leading-relaxed">Tu equipo dedica meses enteros respondiendo mensajes y persiguiendo leads a mano.</p>
+      </div>
+      <div class="glass border border-edge p-6 lift reveal" style="transition-delay:.12s">
+        <div class="text-2xl mb-3">🤯</div>
+        <h3 class="font-manrope font-bold text-white text-sm mb-2">Setters que fallan o se van</h3>
+        <p class="text-gray-500 text-xs font-inter font-light leading-relaxed">Dependes de personas para el proceso comercial. Cuando algo falla, el negocio para.</p>
+      </div>
+      <div class="glass border border-edge p-6 lift reveal" style="transition-delay:.18s">
+        <div class="text-2xl mb-3">📉</div>
+        <h3 class="font-manrope font-bold text-white text-sm mb-2">Leads fríos sin retargeting</h3>
+        <p class="text-gray-500 text-xs font-inter font-light leading-relaxed">Los que no compran a la primera desaparecen. Nadie los calienta ni los persigue a largo plazo.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+
+<!-- ╔══════════════════════════════════╗
+     ║  SOLUTION                       ║
+     ╚══════════════════════════════════╝ -->
+<section class="max-w-5xl mx-auto px-6 py-20">
+  <div class="grid md:grid-cols-2 gap-14 items-start">
+
+    <div class="reveal">
+      <div class="badge mb-5">La solución</div>
+      <h2 class="font-manrope font-extrabold text-3xl md:text-4xl tracking-tight leading-tight mb-5">
+        El Ecosistema<br>
+        <span class="text-lime serif">Comercial con IA</span>
+      </h2>
+      <div class="space-y-3 text-gray-400 font-inter font-light text-sm leading-relaxed">
+        <p>Nuestro software propio se integra en tu proceso comercial y <span class="text-white font-normal">gestiona cada lead de forma personalizada</span>, 24/7, sin que se note que es una IA.</p>
+        <p>Desde el primer contacto hasta la venta, el ecosistema conversa, cualifica, agenda y persigue a cada interesado por todas las vías — sin que tú dediques ni un segundo.</p>
+        <p class="text-gray-600">Lo adaptamos completamente a tu negocio, porque <span class="text-gray-400">ningún proceso comercial es igual</span>.</p>
+      </div>
+    </div>
+
+    <ul class="space-y-2 reveal" style="transition-delay:.08s" id="feat-list"></ul>
+
+  </div>
+</section>
+
+
+<!-- ╔══════════════════════════════════╗
+     ║  STATS                          ║
+     ╚══════════════════════════════════╝ -->
+<section class="alt-bg border-t border-b border-edge py-20">
+  <div class="max-w-5xl mx-auto px-6">
+
+    <div class="text-center mb-14 reveal">
+      <div class="badge mb-5">Resultados reales</div>
+      <h2 class="font-manrope font-extrabold text-3xl md:text-4xl tracking-tight">
+        Números que <span class="text-lime serif">no mienten</span>
+      </h2>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="stat-grid"></div>
+
+  </div>
+</section>
+
+
+<!-- ╔══════════════════════════════════╗
+     ║  TESTIMONIALS                   ║
+     ╚══════════════════════════════════╝ -->
+<section id="resultados" class="max-w-5xl mx-auto px-6 py-20">
+    <h2 class="font-manrope font-extrabold text-3xl md:text-4xl tracking-tight">
+      Lo que consiguen<br>
+      <span class="text-lime serif">nuestros clientes</span>
+    </h2>
+  </div>
+
+  <div class="grid md:grid-cols-2 gap-5">
+
+    <div class="glass border border-edge p-7 lift reveal relative overflow-hidden">
+      <div class="absolute top-3 right-5 font-serif text-7xl text-lime opacity-10 leading-none select-none">"</div>
+      <div class="flex items-center gap-3 mb-5">
+        <div class="w-9 h-9 bg-lime flex items-center justify-center font-manrope font-extrabold text-ink text-sm flex-shrink-0">N</div>
+        <div>
+          <p class="font-manrope font-bold text-sm text-white">Noble Art Academy</p>
+          <p class="text-gray-600 text-xs uppercase tracking-wider">Academia de Tatuaje · Online & Presencial</p>
+        </div>
+      </div>
+      <div class="flex gap-5 pb-5 mb-5 border-b border-edge">
+        <div><p class="font-manrope font-extrabold text-2xl text-white leading-none">X7</p><p class="text-gray-600 text-xs">llamadas/mes</p></div>
+        <div><p class="font-manrope font-extrabold text-2xl text-white leading-none">0h</p><p class="text-gray-600 text-xs">gestión leads</p></div>
+        <div><p class="font-manrope font-extrabold text-2xl text-white leading-none">8m</p><p class="text-gray-600 text-xs">para lograrlo</p></div>
+      </div>
+      <p class="text-gray-400 text-xs font-inter font-light leading-relaxed">Con 3.000 leads/mes apenas agendaban 60 llamadas. Al mes de activar el Ecosistema pasaron a <span class="text-white">+130</span>. A los 8 meses generan más de <span class="text-lime">400 llamadas mensuales</span> con 0 horas de gestión.</p>
+    </div>
+
+    <div class="glass border border-edge p-7 lift reveal relative overflow-hidden" style="transition-delay:.08s">
+      <div class="absolute top-3 right-5 font-serif text-7xl text-lime opacity-10 leading-none select-none">"</div>
+      <div class="flex items-center gap-3 mb-5">
+        <div class="w-9 h-9 bg-lime flex items-center justify-center font-manrope font-extrabold text-ink text-sm flex-shrink-0">V</div>
+        <div>
+          <p class="font-manrope font-bold text-sm text-white">Visa Homes</p>
+          <p class="text-gray-600 text-xs uppercase tracking-wider">Casas Industrializadas · Cataluña</p>
+        </div>
+      </div>
+      <div class="flex gap-5 pb-5 mb-5 border-b border-edge">
+        <div><p class="font-manrope font-extrabold text-2xl text-white leading-none">+120</p><p class="text-gray-600 text-xs">llamadas/mes</p></div>
+        <div><p class="font-manrope font-extrabold text-2xl text-white leading-none">5→120</p><p class="text-gray-600 text-xs">agendamientos</p></div>
+        <div><p class="font-manrope font-extrabold text-2xl text-white leading-none">↓</p><p class="text-gray-600 text-xs">coste ads</p></div>
+      </div>
+      <p class="text-gray-400 text-xs font-inter font-light leading-relaxed">De 5-15 llamadas/mes con un comercial desbordado a <span class="text-lime">+120 llamadas cualificadas</span> en 5 meses. Misma inversión en anuncios, proceso irreemplazable y reducción de costes conseguida.</p>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+
+<!-- ╔══════════════════════════════════╗
+     ║  HOW IT WORKS                   ║
+     ╚══════════════════════════════════╝ -->
+<section class="alt-bg border-t border-edge py-20">
+  <div class="max-w-3xl mx-auto px-6">
+
+    <div class="text-center mb-14 reveal">
+      <div class="badge mb-5">El proceso</div>
+      <h2 class="font-manrope font-extrabold text-3xl md:text-4xl tracking-tight">
+        De interesado a cliente<br>
+        <span class="text-lime serif">en 2 semanas</span>
+      </h2>
+    </div>
+
+    <div class="space-y-0" id="steps-list"></div>
+
+  </div>
+</section>
+
+
+
+
+
+
+
+<!-- ╔══════════════════════════════════╗
+     ║  FAQ                            ║
+     ╚══════════════════════════════════╝ -->
+<section class="alt-bg border-t border-edge py-20">
+  <div class="max-w-3xl mx-auto px-6">
+
+    <div class="text-center mb-12 reveal">
+      <div class="badge mb-5">Preguntas frecuentes</div>
+      <h2 class="font-manrope font-extrabold text-3xl md:text-4xl tracking-tight">
+        Resolvemos tus <span class="text-lime serif">dudas</span>
+      </h2>
+    </div>
+
+    <div class="reveal" id="faq-list"></div>
+
+  </div>
+</section>
+
+
+<!-- ╔══════════════════════════════════╗
+     ║  TEAM                           ║
+     ╚══════════════════════════════════╝ -->
+<section class="max-w-5xl mx-auto px-6 py-20">
+  <div class="text-center mb-12 reveal">
+    <div class="badge mb-5">El equipo</div>
+    <h2 class="font-manrope font-extrabold text-3xl md:text-4xl tracking-tight">
+      Las personas detrás<br>
+      <span class="text-lime serif">del sistema</span>
+    </h2>
+  </div>
+  <div class="grid grid-cols-2 md:grid-cols-3 gap-3" id="team-grid"></div>
+</section>
+
+<div class="divider"></div>
+
+
+<!-- ╔══════════════════════════════════╗
+     ║  CTA FINAL                      ║
+     ╚══════════════════════════════════╝ -->
+<section id="cta" class="relative overflow-hidden py-24 noise">
+  <div class="absolute inset-0 hero-bg"></div>
+  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[400px] pointer-events-none"
+    style="background:radial-gradient(ellipse,rgba(200,255,0,0.09) 0%,transparent 70%);filter:blur(60px);"></div>
+
+  <div class="relative max-w-3xl mx-auto px-6 text-center reveal">
+    <div class="badge mb-7 mx-auto w-fit">Empieza hoy</div>
+
+    <h2 class="font-manrope font-extrabold text-4xl md:text-[3.8rem] tracking-tight leading-[1.02] mb-6">
+      Tu negocio no debería<br>
+      depender de personas<br>
+      <span class="text-lime text-glow serif">para vender.</span>
+    </h2>
+
+    <p class="text-gray-400 font-inter font-light text-base max-w-md mx-auto mb-10 leading-relaxed">
+      Deja tus datos y te mostramos el Ecosistema en vivo y los resultados de clientes reales.
+    </p>
+
+    <div class="glass-lime border border-lime/20 p-8 max-w-sm mx-auto lime-glow">
+      <p class="font-manrope font-bold text-sm text-white mb-1">Ver el Ecosistema en vivo</p>
+      <p class="text-gray-500 text-xs font-inter font-light mb-5">Marta, experta del equipo, te lo muestra todo en directo</p>
+      <div class="space-y-2.5 mb-4">
+        <input id="f-name"  type="text"  placeholder="Tu nombre"    class="w-full bg-ink border border-edge text-white text-xs font-inter px-4 py-3 placeholder-gray-600 focus:outline-none focus:border-lime/40 transition-colors" />
+        <input id="f-email" type="email" placeholder="Tu email"     class="w-full bg-ink border border-edge text-white text-xs font-inter px-4 py-3 placeholder-gray-600 focus:outline-none focus:border-lime/40 transition-colors" />
+        <input id="f-phone" type="tel"   placeholder="Tu WhatsApp"  class="w-full bg-ink border border-edge text-white text-xs font-inter px-4 py-3 placeholder-gray-600 focus:outline-none focus:border-lime/40 transition-colors" />
+      </div>
+      <button onclick="submitForm()" id="f-btn" class="btn-lime text-sm py-3.5 w-full font-manrope font-bold">
+        Ver el Ecosistema en vivo →
+      </button>
+      <p id="f-err" class="text-red-400 text-xs font-inter mt-2 text-center hidden">Por favor rellena todos los campos</p>
+      <p class="text-gray-700 text-xs font-inter mt-3 text-center">También te mostramos resultados de clientes reales</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ╔══════════════════════════════════╗
+     ║  FOOTER                         ║
+     ╚══════════════════════════════════╝ -->
+<footer class="bg-panel border-t border-edge py-8 px-6">
+  <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+    <span class="font-manrope font-extrabold text-sm">
+      <span class="text-white">Sistemas</span><span class="text-lime">conIA</span>
+    </span>
+    <p class="text-gray-700 text-xs font-inter font-light text-center leading-relaxed">
+      AI SYSTEMS ltd. · ul. Grigor Cheshmedzhiev 29, ap. 10, 1404, Sofia, Bulgaria<br>
+      ЕЙ АЙ СИСТЕМИ ЕООД · Nº 208733960 · © 2025 Sistemas con IA
+    </p>
+  </div>
+</footer>
+
+
+<!-- ╔══════════════════════════════════╗
+     ║  JS                             ║
+     ╚══════════════════════════════════╝ -->
+<script>
+// ── Data ──────────────────────────────────────────────────────────────────────
+
+const features = [
+  'Conversaciones personalizadas en WhatsApp, Instagram, Facebook y correo',
+  'Persecución indefinida por email y anuncios hasta que compren',
+  'Cualificación automática del lead según su fase',
+  'Agendamiento de llamadas sin intervención humana',
+  'Software propio alojado en nuestros servidores, 100% adaptado a tu negocio',
+  'Menos del 1% de leads detecta que habla con una IA',
+];
+
+const stats = [
+  { val:'X7',   sub:'llamadas/mes en 8 meses',    note:'Noble Art Academy' },
+  { val:'+120', sub:'llamadas cualificadas/mes',   note:'Visa Homes' },
+  { val:'0h',   sub:'de gestión de leads al mes',  note:'Resultado típico' },
+  { val:'<1%',  sub:'leads que detectan la IA',    note:'Media global' },
+];
+
+const steps = [
+  { n:'01', title:'Onboarding & Diseño del Proceso Comercial',   body:'Llamada de onboarding donde configuramos todas las plataformas (IG, FB, WhatsApp, correo) y diseñamos el proceso comercial completo contigo. Duración aprox. 3 días.' },
+  { n:'02', title:'Implementación técnica del Ecosistema',        body:'Montamos flujos de IA, automatizaciones, secuencias de email, retargeting y conversaciones de WhatsApp. Lo probamos hasta que funciona perfecto. Duración: ~1 semana.' },
+  { n:'03', title:'Activación & Optimización continua',          body:'El ecosistema entra en funcionamiento real. Monitorizamos y optimizamos hasta que el cliente consigue los mejores resultados posibles.' },
+  { n:'+',  title:'Colaboración Anual (opcional)',                body:'Nuestro equipo optimiza tu proceso comercial durante 1 año: nuevas vías de conversión, mejora de comerciales, escalado de tráfico y optimización de redes. Con garantía de resultados.', lime:true },
+];
+
+
+
+
+const faqs = [
+  { q:'¿Se nota que es una IA? A las personas no les gusta hablar con máquinas', a:'Trabajamos muy bien el equipo de IAs para humanizar las conversaciones. Menos del 1% de los leads detectan que hablan con una IA. Si alguno lo detecta, el sistema lo bloquea automáticamente y entra un humano real. Y cada mes ese porcentaje es menor.' },
+  { q:'Si trabajáis con muchos sectores, ¿seréis efectivos en el mío?', a:'Tenemos clientes en +20 sectores y somos efectivos en todos porque adaptamos el Ecosistema al proceso comercial específico de cada negocio. No es un producto genérico: lo construimos desde cero para ti.' },
+  { q:'¿Puedo alojarlo en mis propios servidores?', a:'No. Anteriormente lo permitíamos, pero ya no. Si algo falla y no está en nuestros servidores, no podemos solucionarlo rápidamente — y un error significa dinero perdido para ti.' },
+  { q:'¿Hay garantía de resultados?', a:'No garantizamos resultados específicos por la implementación del Ecosistema, pero sí garantizamos montar el proceso comercial más efectivo posible en 2 semanas y mantenerlo operativo durante todo el año. Para la Colaboración Anual sí hay garantía de resultados.' },
+  { q:'¿Se puede pagar mensualmente?', a:'Trabajamos con contratos anuales, pero ofrecemos financiación propia para fraccionar el pago hasta en 4 cuotas mensuales. Hablamos de ello en la demo.' },
+  { q:'¿Con qué tipo de negocios trabajáis?', a:'Cualquier negocio que dependa de captar un interesado y no pueda permitirse perderlo. Academias online, clínicas, agencias, consultoría, inmobiliarias, coaches... Si tienes leads entrando, el Ecosistema los convierte.' },
+];
+
+const team = [
+  { init:'D',  name:'Daniel Spiri', role:'CEO · Ingeniería de Sistemas & Prompting' },
+  { init:'S',  name:'Steven',       role:'Proceso Comercial' },
+  { init:'A',  name:'Antonio',      role:'Proceso Comercial' },
+  { init:'E',  name:'Erik',         role:'Estructura de Contenido & Redes' },
+  { init:'J',  name:'Joan',         role:'Meta Ads & Tráfico' },
+  { init:'An', name:'Andreu',       role:'Montajes Técnicos Avanzados' },
+];
+
+
+// ── Render ─────────────────────────────────────────────────────────────────────
+
+document.getElementById('feat-list').innerHTML = features.map(f => `
+  <li class="glass-lime flex items-start gap-3 p-3.5 text-xs font-inter font-light text-gray-300 border border-lime/15">
+    <span class="mt-0.5 w-4 h-4 flex-shrink-0 flex items-center justify-center bg-lime text-ink font-bold text-xs">✓</span>${f}
+  </li>`).join('');
+
+document.getElementById('stat-grid').innerHTML = stats.map((s,i) => `
+  <div class="glass border border-edge p-6 text-center lift reveal" style="transition-delay:${i*.06}s">
+    <div class="font-manrope font-extrabold text-[2.6rem] text-lime text-glow leading-none mb-1">${s.val}</div>
+    <p class="text-gray-500 text-xs font-inter leading-snug">${s.sub}</p>
+    <p class="text-gray-700 text-xs mt-1 font-serif italic">${s.note}</p>
+  </div>`).join('');
+
+document.getElementById('steps-list').innerHTML = steps.map((s,i,arr) => `
+  <div class="flex gap-5 relative reveal pb-${i<arr.length-1?'10':'0'}" style="transition-delay:${i*.08}s">
+    <div class="flex-shrink-0 relative">
+      <div class="w-10 h-10 ${s.lime?'bg-lime text-ink':'border border-lime text-lime bg-ink'} flex items-center justify-center font-manrope font-extrabold text-sm">${s.n}</div>
+      ${i<arr.length-1?'<div class="step-line"></div>':''}
+    </div>
+    <div class="${s.lime?'glass-lime border border-lime/20':'glass border border-edge'} p-5 flex-1">
+      <h3 class="font-manrope font-bold ${s.lime?'text-lime':'text-white'} text-sm mb-1">${s.title}</h3>
+      <p class="text-gray-500 text-xs font-inter font-light leading-relaxed">${s.body}</p>
+    </div>
+  </div>`).join('');
+
+
+
+
+document.getElementById('faq-list').innerHTML = faqs.map(f => `
+  <div class="faq-item">
+    <button class="w-full flex items-center justify-between py-5 text-left gap-4" onclick="toggleFaq(this)">
+      <span class="font-manrope font-semibold text-sm text-white leading-snug">${f.q}</span>
+      <span class="faq-icon flex-shrink-0">+</span>
+    </button>
+    <div class="faq-answer">
+      <p class="text-gray-500 text-xs font-inter font-light leading-relaxed pb-5">${f.a}</p>
+    </div>
+  </div>`).join('');
+
+document.getElementById('team-grid').innerHTML = team.map((m,i) => `
+  <div class="glass border border-edge p-5 lift reveal text-center" style="transition-delay:${i*.05}s">
+    <div class="w-10 h-10 bg-lime text-ink font-manrope font-extrabold text-sm flex items-center justify-center mx-auto mb-3">${m.init}</div>
+    <p class="font-manrope font-bold text-sm text-white mb-1">${m.name}</p>
+    <p class="text-gray-600 text-xs font-inter font-light leading-snug">${m.role}</p>
+  </div>`).join('');
+
+
+// ── Smooth scroll ──────────────────────────────────────────────────────────────
+function smoothTo(id, e) {
+  if(e) e.preventDefault();
+  const el = document.getElementById(id);
+  if(el) el.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+// ── Form submit → webhook → gracias.html ──────────────────────────────────────
+async function submitForm() {
+  const name  = document.getElementById('f-name').value.trim();
+  const email = document.getElementById('f-email').value.trim();
+  const phone = document.getElementById('f-phone').value.trim();
+  const err   = document.getElementById('f-err');
+  const btn   = document.getElementById('f-btn');
+
+  if(!name || !email || !phone) {
+    err.classList.remove('hidden');
+    return;
+  }
+  err.classList.add('hidden');
+  btn.textContent = 'Enviando...';
+  btn.style.opacity = '0.7';
+  btn.disabled = true;
+
+  try {
+    await fetch('https://n8n.srv789864.hstgr.cloud/webhook/d109d292-8e5d-4ac0-95ba-2edea3ef4d0d', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nombre: name, email, whatsapp: phone, fuente: 'VSL Ecosistema' }),
+      mode: 'no-cors'
+    });
+  } catch(e) { /* no-cors siempre va aquí, se ignora */ }
+
+  window.location.href = 'gracias.html';
+}
+
+function toggleFaq(btn) {
+  const item = btn.closest('.faq-item');
+  document.querySelectorAll('.faq-item.open').forEach(i => { if(i!==item) i.classList.remove('open'); });
+  item.classList.toggle('open');
+}
+
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+
+</body>
 </html>
