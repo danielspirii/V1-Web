@@ -4,11 +4,16 @@ import { Send, CheckCircle, Smartphone, Mail } from 'lucide-react';
 import SuccessJourney from './SuccessJourney';
 
 const Demo: React.FC = () => {
+    // 1. Separé el teléfono del formData general
     const [formData, setFormData] = useState({
         name: '',
-        email: '',
-        phone: ''
+        email: ''
     });
+    
+    // 2. Nuevos estados para controlar el prefijo y el número por separado
+    const [prefix, setPrefix] = useState('+34');
+    const [phoneInput, setPhoneInput] = useState('');
+    
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -16,13 +21,19 @@ const Demo: React.FC = () => {
         e.preventDefault();
         setIsLoading(true);
 
+        // 3. Juntamos el prefijo y el número justo antes de enviarlo a n8n
+        const dataToSend = {
+            ...formData,
+            phone: `${prefix} ${phoneInput}`
+        };
+
         try {
             await fetch('https://n8n.srv789864.hstgr.cloud/webhook/4a54227f-32e8-4000-b38c-ec9902441dab', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(formData),
+                body: JSON.stringify(dataToSend),
             });
             setIsSubmitted(true);
             window.scrollTo(0, 0);
@@ -102,21 +113,42 @@ const Demo: React.FC = () => {
                         </div>
                     </div>
 
+                    {/* 4. Aquí está el nuevo diseño del campo del teléfono con el selector */}
                     <div>
                         <label htmlFor="phone" className="block text-sm font-medium text-zinc-300 mb-2">
-                            Teléfono <span className="text-[#B1EF42] text-xs ml-1">(con prefijo obligatorio)</span>
+                            WhatsApp
                         </label>
-                        <div className="relative">
-                            <Smartphone className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 w-5 h-5" />
-                            <input
-                                type="tel"
-                                id="phone"
-                                required
-                                className="w-full bg-black border border-zinc-800 rounded-xl pl-12 pr-4 py-3 text-white focus:outline-none focus:border-[#B1EF42] transition-colors"
-                                placeholder="+34 600 000 000"
-                                value={formData.phone}
-                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                            />
+                        <div className="flex gap-2">
+                            <div className="relative w-[130px]">
+                                <select
+                                    value={prefix}
+                                    onChange={(e) => setPrefix(e.target.value)}
+                                    className="w-full bg-black border border-zinc-800 rounded-xl px-2 py-3 text-white focus:outline-none focus:border-[#B1EF42] transition-colors appearance-none cursor-pointer text-sm"
+                                >
+                                    <option value="+34">🇪🇸 +34</option>
+                                    <option value="+52">🇲🇽 +52</option>
+                                    <option value="+54">🇦🇷 +54</option>
+                                    <option value="+57">🇨🇴 +57</option>
+                                    <option value="+56">🇨🇱 +56</option>
+                                    <option value="+51">🇵🇪 +51</option>
+                                    <option value="+1">🇺🇸 +1</option>
+                                    <option value="+593">🇪🇨 +593</option>
+                                    <option value="+58">🇻🇪 +58</option>
+                                    <option value="+502">🇬🇹 +502</option>
+                                </select>
+                            </div>
+                            <div className="relative flex-1">
+                                <Smartphone className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 w-5 h-5" />
+                                <input
+                                    type="tel"
+                                    id="phone"
+                                    required
+                                    className="w-full bg-black border border-zinc-800 rounded-xl pl-12 pr-4 py-3 text-white focus:outline-none focus:border-[#B1EF42] transition-colors"
+                                    placeholder="600 000 000"
+                                    value={phoneInput}
+                                    onChange={(e) => setPhoneInput(e.target.value)}
+                                />
+                            </div>
                         </div>
                     </div>
 
