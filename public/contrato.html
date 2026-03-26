@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contrato — Sistemas con IA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--lime:#C8FF00;--ld:rgba(200,255,0,0.09);--lb:rgba(200,255,0,0.22);--ink:#080808;--dark:#0f0f0f;--panel:#131313;--edge:#1e1e1e;--white:#f2f2f2;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:var(--ink);color:var(--white);font-family:'Manrope',sans-serif;min-height:100vh;display:flex;flex-direction:column;}
+    ::-webkit-scrollbar{width:5px;} ::-webkit-scrollbar-thumb{background:var(--lime);}
+    nav{position:sticky;top:0;z-index:50;background:rgba(8,8,8,0.93);backdrop-filter:blur(20px);border-bottom:1px solid var(--edge);padding:0 clamp(20px,5vw,64px);height:62px;display:flex;align-items:center;justify-content:space-between;}
+    .nav-logo{font-size:14px;font-weight:800;color:#444;} .nav-logo span{color:var(--lime);}
+    .nav-step{font-size:11px;font-weight:700;color:#333;letter-spacing:.08em;text-transform:uppercase;}
+
+    /* ROADMAP */
+    .roadmap-bar{padding:28px clamp(20px,5vw,64px) 0;max-width:700px;margin:0 auto;width:100%;}
+    .roadmap{display:flex;align-items:center;justify-content:center;gap:0;}
+    .rm-step{display:flex;flex-direction:column;align-items:center;gap:8px;flex:1;}
+    .rm-num{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;border:2px solid;}
+    .rm-step.done .rm-num{background:var(--lime);border-color:var(--lime);color:var(--ink);}
+    .rm-step.active .rm-num{background:var(--ld);border-color:var(--lime);color:var(--lime);}
+    .rm-step.pending .rm-num{background:var(--panel);border-color:var(--edge);color:#333;}
+    .rm-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;text-align:center;}
+    .rm-step.done .rm-label{color:#666;}
+    .rm-step.active .rm-label{color:var(--lime);}
+    .rm-step.pending .rm-label{color:#333;}
+    .rm-line{flex:1;height:1px;margin-top:-24px;}
+    .rm-line.done{background:var(--lime);}
+    .rm-line.pending{background:var(--edge);}
+
+    /* MAIN */
+    main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:clamp(48px,8vw,80px) clamp(20px,5vw,64px);}
+    .contract-card{
+      max-width:600px;width:100%;text-align:center;
+      background:var(--dark);border:1px solid var(--edge);padding:clamp(40px,6vw,60px) clamp(28px,5vw,50px);
+      position:relative;overflow:hidden;
+    }
+    .contract-card::before{
+      content:'';position:absolute;top:0;left:0;right:0;height:2px;
+      background:linear-gradient(to right,transparent,var(--lime),transparent);
+    }
+
+    .contract-icon{font-size:48px;margin-bottom:20px;display:block;}
+
+    .eyebrow{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--lime);margin-bottom:14px;}
+    h1{font-size:clamp(24px,5vw,36px);font-weight:900;letter-spacing:-.04em;line-height:1.1;margin-bottom:12px;}
+    h1 .serif{font-family:'Instrument Serif',serif;font-style:italic;font-weight:400;}
+    .desc{font-size:clamp(13px,2.8vw,15px);color:#555;line-height:1.7;margin-bottom:28px;}
+    .desc strong{color:#999;font-weight:600;}
+
+    /* WHAT TO EXPECT */
+    .points{text-align:left;margin-bottom:32px;display:flex;flex-direction:column;gap:8px;}
+    .pt{display:flex;align-items:flex-start;gap:10px;background:var(--panel);border:1px solid var(--edge);padding:11px 14px;}
+    .pt-ic{flex-shrink:0;width:18px;height:18px;background:var(--ld);border:1px solid var(--lb);display:flex;align-items:center;justify-content:center;color:var(--lime);font-size:10px;font-weight:900;margin-top:1px;}
+    .pt p{font-size:13px;font-weight:500;color:#888;line-height:1.5;} .pt p strong{color:var(--white);font-weight:700;}
+
+    /* CTA */
+    .sign-btn{
+      display:block;width:100%;text-align:center;
+      background:var(--lime);color:var(--ink);
+      font-family:'Manrope',sans-serif;font-size:15px;font-weight:900;
+      letter-spacing:.02em;padding:18px 24px;text-decoration:none;
+      border:none;cursor:pointer;transition:background .2s,transform .15s;
+      position:relative;overflow:hidden;
+    }
+    .sign-btn::after{content:'→';margin-left:10px;transition:transform .2s;}
+    .sign-btn:hover{background:#d8ff1a;transform:translateY(-2px);}
+
+    .time-note{font-size:11px;color:#333;margin-top:12px;font-weight:600;letter-spacing:.04em;}
+
+    footer{border-top:1px solid var(--edge);padding:20px clamp(20px,5vw,64px);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+    .fl{font-size:12px;font-weight:800;color:#333;} .fl span{color:var(--lime);}
+    footer p{font-size:11px;color:#282828;}
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">SistemasconIA<span>.com</span></div>
+  <div class="nav-step">Paso 2 de 3</div>
+</nav>
+
+<div class="roadmap-bar">
+  <div class="roadmap">
+    <div class="rm-step done"><div class="rm-num">✓</div><div class="rm-label">Datos del<br>negocio</div></div>
+    <div class="rm-line done"></div>
+    <div class="rm-step active"><div class="rm-num">2</div><div class="rm-label">Firma del<br>contrato</div></div>
+    <div class="rm-line pending"></div>
+    <div class="rm-step pending"><div class="rm-num">3</div><div class="rm-label">Llamada de<br>onboarding</div></div>
+  </div>
+</div>
+
+<main>
+  <div class="contract-card">
+    <span class="contract-icon">📋</span>
+    <div class="eyebrow">Paso 2 · Contrato legal</div>
+    <h1>Revisa y firma el<br>contrato <span class="serif">en 1 minuto.</span></h1>
+    <p class="desc">
+      Antes de arrancar necesitamos formalizar la relación entre <strong>AI SYSTEMS ltd.</strong> y tu negocio. Es un proceso rápido, completamente digital.
+    </p>
+
+    <div class="points">
+      <div class="pt"><div class="pt-ic">✓</div><p><strong>Revisión del contrato</strong> — léelo tranquilamente, tienes toda la información del acuerdo anual</p></div>
+      <div class="pt"><div class="pt-ic">✓</div><p><strong>Firma digital en segundos</strong> — no necesitas imprimir ni enviar nada, todo online</p></div>
+      <div class="pt"><div class="pt-ic">✓</div><p><strong>Recibes una copia</strong> firmada por correo electrónico inmediatamente</p></div>
+    </div>
+
+    <a href="https://sendlink.co/documents/doc-form/69c043dca1782067b2a1c676?locale=en-US"
+       class="sign-btn"
+       onclick="handleSign(event)">
+      Proceder con la firma del contrato
+    </a>
+    <p class="time-note">⏱ Proceso completo en menos de 1 minuto</p>
+  </div>
+</main>
+
+<footer>
+  <div class="fl">SistemasconIA<span>.com</span></div>
+  <p>AI SYSTEMS ltd. · Sofia, Bulgaria · Nº 208733960</p>
+</footer>
+
+<script>
+function handleSign(e){
+  // Abre el contrato en nueva pestaña y prepara la redirección
+  window.open('https://sendlink.co/documents/doc-form/69c043dca1782067b2a1c676?locale=en-US','_blank');
+  e.preventDefault();
+  // Muestra botón "Ya he firmado" tras abrir
+  setTimeout(()=>{
+    const btn=document.querySelector('.sign-btn');
+    btn.textContent='✓ Ya he firmado el contrato — Continuar';
+    btn.style.background='#0f0f0f';
+    btn.style.color='var(--lime)';
+    btn.style.border='1px solid var(--lime)';
+    btn.onclick=()=>{ window.location.href='/llamada-onboarding'; };
+  },1500);
+}
+</script>
+</body>
+</html>

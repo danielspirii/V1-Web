@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Siguientes Pasos — Sistemas con IA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--lime:#C8FF00;--ld:rgba(200,255,0,0.09);--lb:rgba(200,255,0,0.22);--ink:#080808;--dark:#0f0f0f;--panel:#131313;--edge:#1e1e1e;--white:#f2f2f2;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:var(--ink);color:var(--white);font-family:'Manrope',sans-serif;min-height:100vh;}
+    ::-webkit-scrollbar{width:5px;} ::-webkit-scrollbar-thumb{background:var(--lime);}
+
+    nav{position:sticky;top:0;z-index:50;background:rgba(8,8,8,0.93);backdrop-filter:blur(20px);border-bottom:1px solid var(--edge);padding:0 clamp(20px,5vw,64px);height:62px;display:flex;align-items:center;justify-content:space-between;}
+    .nav-logo{font-size:14px;font-weight:800;color:#444;} .nav-logo span{color:var(--lime);}
+    .nav-step{font-size:11px;font-weight:700;color:#333;letter-spacing:.08em;text-transform:uppercase;}
+
+    /* WELCOME ANIMATION */
+    .welcome{
+      text-align:center;
+      padding:clamp(52px,8vw,90px) clamp(20px,5vw,64px) 48px;
+      background:radial-gradient(ellipse 90% 60% at 50% 0%,rgba(200,255,0,0.1) 0%,transparent 65%);
+      position:relative;overflow:hidden;
+    }
+    .confetti-wrap{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+    .confetti-wrap span{
+      position:absolute;top:-20px;width:8px;height:8px;border-radius:2px;
+      animation:fall linear infinite;
+    }
+    @keyframes fall{
+      0%{transform:translateY(-20px) rotate(0deg);opacity:1;}
+      100%{transform:translateY(110vh) rotate(720deg);opacity:0;}
+    }
+
+    .welcome-badge{
+      display:inline-flex;align-items:center;gap:10px;
+      background:var(--ld);border:1px solid var(--lb);
+      padding:8px 20px;border-radius:100px;margin-bottom:24px;
+      animation:fadeUp .8s ease both;
+    }
+    .wb-icon{font-size:18px;}
+    .wb-text{font-size:11px;font-weight:700;color:var(--lime);letter-spacing:.12em;text-transform:uppercase;}
+
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+
+    h1{font-size:clamp(28px,6vw,52px);font-weight:900;line-height:1.05;letter-spacing:-.04em;margin-bottom:14px;animation:fadeUp .8s .15s ease both;}
+    h1 .lime{color:var(--lime);}
+    h1 .serif{font-family:'Instrument Serif',serif;font-style:italic;font-weight:400;}
+    .wsub{font-size:clamp(14px,2.8vw,17px);color:#555;max-width:540px;margin:0 auto 32px;line-height:1.7;animation:fadeUp .8s .25s ease both;}
+    .wsub strong{color:#999;font-weight:600;}
+
+    /* STEPS ROADMAP */
+    .roadmap{display:flex;align-items:center;justify-content:center;gap:0;max-width:680px;margin:0 auto;animation:fadeUp .8s .35s ease both;}
+    .rm-step{display:flex;flex-direction:column;align-items:center;gap:8px;flex:1;}
+    .rm-num{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;border:2px solid;}
+    .rm-step.active .rm-num{background:var(--lime);border-color:var(--lime);color:var(--ink);}
+    .rm-step.pending .rm-num{background:var(--panel);border-color:var(--edge);color:#333;}
+    .rm-label{font-size:10px;font-weight:700;color:#333;text-transform:uppercase;letter-spacing:.08em;text-align:center;}
+    .rm-step.active .rm-label{color:var(--lime);}
+    .rm-line{flex:1;height:1px;background:var(--edge);margin-top:-24px;}
+
+    /* FORM SECTION */
+    .form-section{max-width:780px;margin:56px auto 0;padding:0 clamp(20px,5vw,64px);}
+    .sec-eyebrow{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--lime);margin-bottom:10px;}
+    .sec-title{font-size:clamp(22px,4.5vw,32px);font-weight:900;letter-spacing:-.03em;line-height:1.1;margin-bottom:8px;}
+    .sec-desc{font-size:14px;color:#555;line-height:1.7;margin-bottom:28px;}
+    .sec-desc strong{color:#999;font-weight:600;}
+
+    .form-wrap{background:var(--dark);border:1px solid var(--edge);padding:0;overflow:hidden;}
+    .form-top{background:var(--panel);border-bottom:1px solid var(--edge);padding:14px 20px;display:flex;align-items:center;gap:8px;}
+    .form-top-dot{width:8px;height:8px;border-radius:50%;background:var(--lime);}
+    .form-top-label{font-size:11px;font-weight:700;color:#444;letter-spacing:.08em;text-transform:uppercase;}
+
+    .embed-wrapper{width:100%;min-height:1573px;position:relative;}
+    .embed-wrapper iframe{width:100%;height:100%;min-height:1573px;border:none;display:block;}
+
+    footer{border-top:1px solid var(--edge);padding:20px clamp(20px,5vw,64px);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:60px;}
+    .fl{font-size:12px;font-weight:800;color:#333;} .fl span{color:var(--lime);}
+    footer p{font-size:11px;color:#282828;}
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">SistemasconIA<span>.com</span></div>
+  <div class="nav-step">Paso 1 de 3</div>
+</nav>
+
+<!-- WELCOME -->
+<section class="welcome">
+  <!-- confetti -->
+  <div class="confetti-wrap" id="confetti"></div>
+
+  <div class="welcome-badge">
+    <span class="wb-icon">🎉</span>
+    <span class="wb-text">¡Pago confirmado!</span>
+  </div>
+  <h1>Bienvenido al<br><span class="lime serif">Ecosistema.</span></h1>
+  <p class="wsub">
+    Tu Ecosistema Comercial con IA empieza a construirse ahora mismo.<br>
+    Completa los <strong>3 pasos siguientes</strong> para que podamos arrancar cuanto antes.
+  </p>
+
+  <!-- ROADMAP -->
+  <div class="roadmap">
+    <div class="rm-step active">
+      <div class="rm-num">1</div>
+      <div class="rm-label">Datos de<br>tu negocio</div>
+    </div>
+    <div class="rm-line"></div>
+    <div class="rm-step pending">
+      <div class="rm-num">2</div>
+      <div class="rm-label">Firma del<br>contrato</div>
+    </div>
+    <div class="rm-line"></div>
+    <div class="rm-step pending">
+      <div class="rm-num">3</div>
+      <div class="rm-label">Llamada de<br>onboarding</div>
+    </div>
+  </div>
+</section>
+
+<!-- FORM -->
+<section class="form-section">
+  <div class="sec-eyebrow">Paso 1 · Información de tu negocio</div>
+  <div class="sec-title">Cuéntanos sobre<br>tu negocio.</div>
+  <p class="sec-desc">
+    Rellena este formulario para que nuestro equipo llegue <strong>100% preparado</strong> a la llamada de onboarding. Cuanto más detallado, mejor.
+  </p>
+
+  <div class="form-wrap">
+    <div class="form-top">
+      <div class="form-top-dot"></div>
+      <div class="form-top-label">Formulario de Onboarding</div>
+    </div>
+    <div class="embed-wrapper">
+      <iframe
+        src="https://api.leadconnectorhq.com/widget/form/aaNqoE1A4eKjOjiQlQYq"
+        id="inline-aaNqoE1A4eKjOjiQlQYq"
+        data-layout="{'id':'INLINE'}"
+        data-trigger-type="alwaysShow"
+        data-trigger-value=""
+        data-activation-type="alwaysActivated"
+        data-activation-value=""
+        data-deactivation-type="neverDeactivate"
+        data-deactivation-value=""
+        data-form-name="🟢Formulario Onboarding"
+        data-height="1573"
+        data-layout-iframe-id="inline-aaNqoE1A4eKjOjiQlQYq"
+        data-form-id="aaNqoE1A4eKjOjiQlQYq"
+        title="🟢Formulario Onboarding">
+      </iframe>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="fl">SistemasconIA<span>.com</span></div>
+  <p>AI SYSTEMS ltd. · Sofia, Bulgaria · Nº 208733960</p>
+</footer>
+
+<script src="https://link.msgsndr.com/js/form_embed.js"></script>
+<script>
+  // Confetti animation
+  const wrap = document.getElementById('confetti');
+  const colors = ['#C8FF00','#ffffff','rgba(200,255,0,0.4)','#d0ff44'];
+  for(let i=0;i<36;i++){
+    const s=document.createElement('span');
+    s.style.left=Math.random()*100+'%';
+    s.style.background=colors[Math.floor(Math.random()*colors.length)];
+    s.style.width=(Math.random()*6+4)+'px';
+    s.style.height=(Math.random()*6+4)+'px';
+    s.style.borderRadius=Math.random()>0.5?'50%':'2px';
+    s.style.animationDuration=(Math.random()*3+2)+'s';
+    s.style.animationDelay=(Math.random()*2)+'s';
+    wrap.appendChild(s);
+  }
+  // Redirect after form submit — GHL fires a message event
+  window.addEventListener('message', function(e){
+    if(e.data && (e.data.type==='form-submitted' || (typeof e.data==='string' && e.data.includes('submitted')))){
+      setTimeout(()=>{ window.location.href='/contrato'; },800);
+    }
+  });
+</script>
+</body>
+</html>

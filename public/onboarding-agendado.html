@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>¡Todo listo! — Sistemas con IA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--lime:#C8FF00;--ld:rgba(200,255,0,0.09);--lb:rgba(200,255,0,0.22);--ink:#080808;--dark:#0f0f0f;--panel:#131313;--edge:#1e1e1e;--white:#f2f2f2;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:var(--ink);color:var(--white);font-family:'Manrope',sans-serif;min-height:100vh;overflow-x:hidden;}
+    ::-webkit-scrollbar{width:5px;} ::-webkit-scrollbar-thumb{background:var(--lime);}
+
+    nav{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(8,8,8,0.93);backdrop-filter:blur(20px);border-bottom:1px solid var(--edge);padding:0 clamp(20px,5vw,64px);height:62px;display:flex;align-items:center;justify-content:space-between;}
+    .nav-logo{font-size:14px;font-weight:800;color:#444;} .nav-logo span{color:var(--lime);}
+
+    /* ── FULL ANIMATION HERO ── */
+    .hero{
+      min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+      text-align:center;padding:80px clamp(20px,5vw,64px) 60px;
+      position:relative;overflow:hidden;
+    }
+
+    /* Animated background rings */
+    .rings{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:0;}
+    .ring{
+      position:absolute;border-radius:50%;border:1px solid;
+      top:50%;left:50%;transform:translate(-50%,-50%);
+      animation:expand 4s ease-out infinite;
+    }
+    .ring:nth-child(1){width:200px;height:200px;border-color:rgba(200,255,0,0.3);animation-delay:0s;}
+    .ring:nth-child(2){width:400px;height:400px;border-color:rgba(200,255,0,0.15);animation-delay:.8s;}
+    .ring:nth-child(3){width:600px;height:600px;border-color:rgba(200,255,0,0.08);animation-delay:1.6s;}
+    .ring:nth-child(4){width:800px;height:800px;border-color:rgba(200,255,0,0.04);animation-delay:2.4s;}
+    @keyframes expand{
+      0%{transform:translate(-50%,-50%) scale(.6);opacity:1;}
+      100%{transform:translate(-50%,-50%) scale(1.4);opacity:0;}
+    }
+
+    /* Central icon */
+    .hero-icon{
+      position:relative;z-index:2;
+      width:88px;height:88px;border-radius:50%;
+      background:var(--lime);
+      display:flex;align-items:center;justify-content:center;
+      font-size:38px;margin:0 auto 28px;
+      box-shadow:0 0 60px rgba(200,255,0,0.4);
+      animation:iconPop .6s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    @keyframes iconPop{from{transform:scale(0);opacity:0;}to{transform:scale(1);opacity:1;}}
+
+    .done-label{
+      position:relative;z-index:2;
+      display:inline-flex;align-items:center;gap:8px;
+      background:var(--ld);border:1px solid var(--lb);
+      color:var(--lime);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+      padding:5px 16px;border-radius:100px;margin-bottom:22px;
+      animation:fadeUp .7s .3s ease both;
+    }
+    @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+
+    h1{
+      position:relative;z-index:2;
+      font-size:clamp(32px,7vw,58px);font-weight:900;line-height:1.03;letter-spacing:-.04em;margin-bottom:14px;
+      animation:fadeUp .7s .45s ease both;
+    }
+    h1 .lime{color:var(--lime);} h1 .serif{font-family:'Instrument Serif',serif;font-style:italic;font-weight:400;}
+
+    .hdesc{
+      position:relative;z-index:2;
+      font-size:clamp(14px,2.8vw,17px);color:#555;max-width:520px;margin:0 auto 40px;line-height:1.75;
+      animation:fadeUp .7s .55s ease both;
+    }
+    .hdesc strong{color:#999;font-weight:600;}
+
+    /* WA GROUP HIGHLIGHT */
+    .wa-highlight{
+      position:relative;z-index:2;
+      background:var(--dark);border:1px solid var(--lb);
+      max-width:500px;width:100%;margin:0 auto;
+      padding:20px 24px;
+      animation:fadeUp .7s .65s ease both;
+    }
+    .wa-highlight::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,var(--lime),transparent);}
+    .wa-inner{display:flex;align-items:center;gap:14px;}
+    .wa-icon-wrap{
+      width:48px;height:48px;background:rgba(37,211,102,0.15);border:1px solid rgba(37,211,102,0.3);
+      border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;
+    }
+    .wa-text-wrap{text-align:left;}
+    .wa-title{font-size:14px;font-weight:800;color:var(--white);margin-bottom:4px;}
+    .wa-desc{font-size:12px;color:#555;line-height:1.6;}
+    .wa-desc strong{color:#888;font-weight:700;}
+
+    /* CHECKLIST */
+    .checklist-section{max-width:700px;margin:0 auto;padding:56px clamp(20px,5vw,64px) 0;}
+    .cs-eyebrow{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--lime);margin-bottom:10px;}
+    .cs-title{font-size:clamp(22px,4.5vw,32px);font-weight:900;letter-spacing:-.03em;line-height:1.1;margin-bottom:8px;}
+    .cs-desc{font-size:14px;color:#555;line-height:1.7;margin-bottom:28px;}
+    .cs-desc strong{color:#999;font-weight:600;}
+
+    .checklist{display:flex;flex-direction:column;gap:6px;}
+    .ci{
+      display:flex;align-items:flex-start;gap:12px;
+      background:var(--dark);border:1px solid var(--edge);padding:14px 16px;
+    }
+    .ci-num{
+      width:26px;height:26px;flex-shrink:0;
+      background:var(--ld);border:1px solid var(--lb);
+      display:flex;align-items:center;justify-content:center;
+      color:var(--lime);font-size:11px;font-weight:900;margin-top:1px;
+    }
+    .ci-body{flex:1;}
+    .ci-title{font-size:14px;font-weight:800;color:var(--white);margin-bottom:3px;letter-spacing:-.01em;}
+    .ci-desc{font-size:12.5px;font-weight:400;color:#555;line-height:1.6;}
+
+    /* TEAM SECTION */
+    .team-section{max-width:700px;margin:48px auto 0;padding:0 clamp(20px,5vw,64px);}
+    .team-card{
+      background:var(--dark);border:1px solid var(--lb);padding:24px;
+      position:relative;overflow:hidden;
+    }
+    .team-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,var(--lime),transparent);}
+    .tc-eyebrow{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--lime);margin-bottom:12px;}
+    .tc-members{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+    .tc-m{background:var(--panel);border:1px solid var(--edge);padding:6px 12px;font-size:12px;font-weight:700;color:#777;}
+    .tc-m span{color:var(--white);}
+    .tc-note{font-size:13px;color:#555;line-height:1.6;}
+    .tc-note strong{color:#aaa;font-weight:700;}
+
+    footer{border-top:1px solid var(--edge);padding:20px clamp(20px,5vw,64px);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:60px;}
+    .fl{font-size:12px;font-weight:800;color:#333;} .fl span{color:var(--lime);}
+    footer p{font-size:11px;color:#282828;}
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">SistemasconIA<span>.com</span></div>
+</nav>
+
+<!-- HERO CELEBRATION -->
+<section class="hero">
+  <div class="rings">
+    <div class="ring"></div><div class="ring"></div>
+    <div class="ring"></div><div class="ring"></div>
+  </div>
+
+  <div class="hero-icon">🚀</div>
+  <div class="done-label">✓ Onboarding completado</div>
+  <h1>¡Todo listo!<br>Arrancamos <span class="lime serif">en breve.</span></h1>
+  <p class="hdesc">
+    Tu llamada está agendada y nuestro equipo ya tiene todo lo necesario.<br>
+    <strong>El Ecosistema se pone en marcha.</strong>
+  </p>
+
+  <!-- WA GROUP NOTICE -->
+  <div class="wa-highlight">
+    <div class="wa-inner">
+      <div class="wa-icon-wrap">💬</div>
+      <div class="wa-text-wrap">
+        <div class="wa-title">Grupo de WhatsApp en breve</div>
+        <div class="wa-desc">Nuestro equipo creará el grupo de WhatsApp contigo en <strong>menos de 12 horas</strong>. Por ahí pasarán todas las comunicaciones del proyecto.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUÉ TENER LISTO -->
+<section class="checklist-section">
+  <div class="cs-eyebrow">Antes de la llamada</div>
+  <div class="cs-title">Qué tener listo<br>para el onboarding.</div>
+  <p class="cs-desc">Prepara estas cosas antes de la llamada para aprovechar cada minuto al máximo. <strong>No hace falta que hagas nada técnico</strong>, solo ten los accesos a mano.</p>
+
+  <div class="checklist">
+    <div class="ci">
+      <div class="ci-num">1</div>
+      <div class="ci-body">
+        <div class="ci-title">El número de WhatsApp Business</div>
+        <div class="ci-desc">El número que vas a usar para el Ecosistema. Si es posible, ten el teléfono delante durante la llamada para hacer la verificación al momento.</div>
+      </div>
+    </div>
+    <div class="ci">
+      <div class="ci-num">2</div>
+      <div class="ci-body">
+        <div class="ci-title">Acceso al Business Manager de Meta</div>
+        <div class="ci-desc">Necesitaremos entrar en tu cuenta de Meta Business Suite para conectar Instagram, Facebook y configurar el conjunto de datos de conversiones.</div>
+      </div>
+    </div>
+    <div class="ci">
+      <div class="ci-num">3</div>
+      <div class="ci-body">
+        <div class="ci-title">Acceso a tu correo corporativo</div>
+        <div class="ci-desc">Para configurar los registros DNS y conectar el correo con GoHighLevel. Ten las credenciales del panel de tu dominio a mano.</div>
+      </div>
+    </div>
+    <div class="ci">
+      <div class="ci-num">4</div>
+      <div class="ci-body">
+        <div class="ci-title">Google Calendar activo</div>
+        <div class="ci-desc">Sesión iniciada en Google Calendar durante la llamada para conectarlo al sistema de agendamiento automático del Ecosistema.</div>
+      </div>
+    </div>
+    <div class="ci">
+      <div class="ci-num">5</div>
+      <div class="ci-body">
+        <div class="ci-title">Ordenador delante durante la llamada</div>
+        <div class="ci-desc">Haremos varios ajustes en tiempo real. Es imprescindible que estés delante del ordenador — no vale desde el móvil para esta primera sesión.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TU EQUIPO -->
+<section class="team-section">
+  <div class="team-card">
+    <div class="tc-eyebrow">Tu equipo en Sistemas con IA</div>
+    <div class="tc-members">
+      <div class="tc-m"><span>Daniel</span> · CEO & Sistemas</div>
+      <div class="tc-m"><span>Steven</span> · Proceso Comercial</div>
+      <div class="tc-m"><span>Antonio</span> · Proceso Comercial</div>
+      <div class="tc-m"><span>Andreu</span> · Técnico</div>
+      <div class="tc-m"><span>Joan</span> · Meta Ads</div>
+      <div class="tc-m"><span>Erik</span> · Contenido</div>
+    </div>
+    <p class="tc-note">
+      <strong>Todos listos para arrancarte el Ecosistema.</strong> Cualquier duda antes de la llamada, escríbenos en el grupo de WhatsApp en cuanto lo tengas — respondemos rápido.
+    </p>
+  </div>
+</section>
+
+<footer>
+  <div class="fl">SistemasconIA<span>.com</span></div>
+  <p>AI SYSTEMS ltd. · Sofia, Bulgaria · Nº 208733960</p>
+</footer>
+
+<script>
+  // Particle burst on load
+  function burst(){
+    const colors=['#C8FF00','#ffffff','rgba(200,255,0,0.6)','#e0ff88'];
+    for(let i=0;i<60;i++){
+      const p=document.createElement('div');
+      const size=Math.random()*8+3;
+      const angle=Math.random()*360;
+      const dist=Math.random()*300+100;
+      const duration=Math.random()*1.5+0.8;
+      Object.assign(p.style,{
+        position:'fixed',zIndex:'999',
+        left:'50%',top:'50%',
+        width:size+'px',height:size+'px',
+        borderRadius:Math.random()>.5?'50%':'2px',
+        background:colors[Math.floor(Math.random()*colors.length)],
+        pointerEvents:'none',
+        transition:`all ${duration}s cubic-bezier(.2,.8,.3,1)`,
+        transform:'translate(-50%,-50%)',
+        opacity:'1',
+      });
+      document.body.appendChild(p);
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        const rad=angle*(Math.PI/180);
+        const x=Math.cos(rad)*dist;
+        const y=Math.sin(rad)*dist;
+        p.style.transform=`translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+        p.style.opacity='0';
+      }));
+      setTimeout(()=>p.remove(), duration*1000+100);
+    }
+  }
+  window.addEventListener('load', ()=>{ setTimeout(burst, 400); setTimeout(burst, 900); });
+</script>
+</body>
+</html>
