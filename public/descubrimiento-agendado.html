@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Llamada confirmada — SistemasconIA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800;900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --lima: #C8FF00;
+      --negro: #080808;
+      --blanco: #f0f0f0;
+      --gris: #1a1a1a;
+      --gris2: #252525;
+      --texto-muted: #555;
+      --texto-dim: #333;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--negro);
+      color: var(--blanco);
+      font-family: 'Manrope', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* BG GRID */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(200,255,0,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(200,255,0,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* GLOW TOP */
+    body::after {
+      content: '';
+      position: fixed;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 400px;
+      background: radial-gradient(ellipse, rgba(200,255,0,0.07) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      padding: 28px 0 24px;
+      border-bottom: 1px solid #1a1a1a;
+      margin-bottom: 56px;
+    }
+
+    .logo {
+      font-family: 'Manrope', sans-serif;
+      font-size: 14px;
+      font-weight: 800;
+      color: #3a3a3a;
+      letter-spacing: -0.01em;
+    }
+    .logo span { color: var(--lima); }
+
+    /* ── HERO ── */
+    .hero { margin-bottom: 52px; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(200,255,0,0.07);
+      border: 1px solid rgba(200,255,0,0.2);
+      padding: 5px 14px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--lima);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 22px;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.1s forwards;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--lima);
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.7); }
+    }
+
+    h1 {
+      font-size: clamp(32px, 6vw, 44px);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      color: var(--blanco);
+      margin-bottom: 16px;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.2s forwards;
+    }
+
+    h1 em {
+      font-family: 'Instrument Serif', serif;
+      font-style: italic;
+      color: var(--lima);
+      font-weight: 400;
+    }
+
+    .hero-sub {
+      font-size: 15px;
+      font-weight: 400;
+      color: var(--texto-muted);
+      line-height: 1.7;
+      max-width: 520px;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.3s forwards;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── WHAT TO EXPECT ── */
+    .section-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--lima);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .expect-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 48px;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.4s forwards;
+    }
+
+    .expect-card {
+      background: var(--gris);
+      border: 1px solid #222;
+      padding: 16px 18px;
+      transition: border-color 0.2s;
+    }
+
+    .expect-card:hover { border-color: rgba(200,255,0,0.25); }
+
+    .expect-icon {
+      font-size: 20px;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .expect-card h3 {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--blanco);
+      margin-bottom: 4px;
+    }
+
+    .expect-card p {
+      font-size: 11px;
+      font-weight: 400;
+      color: #444;
+      line-height: 1.55;
+    }
+
+    .divider {
+      height: 1px;
+      background: #1a1a1a;
+      margin: 48px 0;
+    }
+
+    /* ── TESTIMONIOS INTERACTIVOS ── */
+    .testimonios-section {
+      opacity: 0;
+      animation: fadeUp 0.6s 0.5s forwards;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .section-title {
+      font-size: clamp(20px, 4vw, 26px);
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      color: var(--blanco);
+      line-height: 1.1;
+    }
+
+    .section-title em {
+      font-family: 'Instrument Serif', serif;
+      font-style: italic;
+      color: var(--lima);
+      font-weight: 400;
+    }
+
+    .section-sub {
+      font-size: 13px;
+      font-weight: 400;
+      color: #3a3a3a;
+      margin-bottom: 24px;
+    }
+
+    /* TABS */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #1a1a1a;
+      padding-bottom: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+
+    .tab {
+      flex-shrink: 0;
+      padding: 9px 16px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #3a3a3a;
+      cursor: pointer;
+      border: none;
+      background: none;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      letter-spacing: 0.02em;
+      transition: color 0.2s;
+      font-family: 'Manrope', sans-serif;
+    }
+
+    .tab:hover { color: #666; }
+
+    .tab.active {
+      color: var(--lima);
+      border-bottom-color: var(--lima);
+    }
+
+    /* TESTIMONIO CARD */
+    .testimonio-container {
+      position: relative;
+      min-height: 320px;
+    }
+
+    .testimonio-card {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+
+    .testimonio-card.active {
+      opacity: 1;
+      pointer-events: all;
+      position: relative;
+    }
+
+    .t-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .t-negocio {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .t-nombre {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--blanco);
+      letter-spacing: -0.01em;
+    }
+
+    .t-sector {
+      font-size: 11px;
+      font-weight: 600;
+      color: #3a3a3a;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .t-resultado-badge {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+    }
+
+    .t-numero {
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--lima);
+      letter-spacing: -0.04em;
+      line-height: 1;
+    }
+
+    .t-numero-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: #3a3a3a;
+      text-align: right;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* STATS ROW */
+    .t-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .t-stat {
+      background: var(--gris);
+      border: 1px solid #222;
+      padding: 12px 14px;
+      text-align: center;
+    }
+
+    .t-stat-val {
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--blanco);
+      letter-spacing: -0.03em;
+      display: block;
+    }
+
+    .t-stat-val.lima { color: var(--lima); }
+
+    .t-stat-lbl {
+      font-size: 10px;
+      font-weight: 600;
+      color: #3a3a3a;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      display: block;
+      margin-top: 2px;
+    }
+
+    /* QUOTE */
+    .t-quote {
+      background: rgba(200,255,0,0.04);
+      border: 1px solid rgba(200,255,0,0.12);
+      border-left: 2px solid var(--lima);
+      padding: 14px 16px;
+      margin-bottom: 16px;
+    }
+
+    .t-quote p {
+      font-size: 13px;
+      font-weight: 400;
+      color: #666;
+      line-height: 1.65;
+      font-style: italic;
+    }
+
+    /* ADIVINA EL RESULTADO */
+    .guess-game {
+      background: var(--gris);
+      border: 1px solid #222;
+      padding: 20px;
+      margin-top: 20px;
+    }
+
+    .guess-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--lima);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .guess-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #222;
+    }
+
+    .guess-question {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--blanco);
+      margin-bottom: 14px;
+      line-height: 1.4;
+    }
+
+    .guess-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .guess-btn {
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      color: #888;
+      font-family: 'Manrope', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: left;
+      letter-spacing: -0.01em;
+    }
+
+    .guess-btn:hover:not(:disabled) {
+      border-color: #444;
+      color: var(--blanco);
+      background: #222;
+    }
+
+    .guess-btn.correct {
+      background: rgba(200,255,0,0.1);
+      border-color: rgba(200,255,0,0.5);
+      color: var(--lima);
+    }
+
+    .guess-btn.wrong {
+      background: rgba(255,60,60,0.07);
+      border-color: rgba(255,60,60,0.2);
+      color: #553333;
+    }
+
+    .guess-btn:disabled { cursor: default; }
+
+    .guess-result {
+      margin-top: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #555;
+      line-height: 1.5;
+      display: none;
+    }
+
+    .guess-result.show { display: block; }
+
+    .guess-result strong { color: var(--lima); }
+
+    /* NAVIGATION */
+    .t-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid #1a1a1a;
+    }
+
+    .t-nav-btn {
+      background: none;
+      border: 1px solid #222;
+      color: #444;
+      font-family: 'Manrope', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 8px 16px;
+      cursor: pointer;
+      transition: all 0.15s;
+      letter-spacing: 0.04em;
+    }
+
+    .t-nav-btn:hover:not(:disabled) {
+      border-color: #444;
+      color: #888;
+    }
+
+    .t-nav-btn:disabled { opacity: 0.2; cursor: default; }
+
+    .t-dots {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .t-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #222;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .t-dot.active {
+      width: 20px;
+      border-radius: 3px;
+      background: var(--lima);
+    }
+
+    /* ── CTA FINAL ── */
+    .cta-final {
+      margin-top: 52px;
+      background: var(--gris);
+      border: 1px solid #222;
+      padding: 28px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.6s forwards;
+    }
+
+    .cta-text h3 {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--blanco);
+      margin-bottom: 4px;
+      letter-spacing: -0.02em;
+    }
+
+    .cta-text p {
+      font-size: 13px;
+      color: #3a3a3a;
+      line-height: 1.5;
+    }
+
+    .cta-wa {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: none;
+      border: 1px solid rgba(200,255,0,0.3);
+      color: var(--lima);
+      font-family: 'Manrope', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 10px 18px;
+      text-decoration: none;
+      letter-spacing: 0.04em;
+      transition: all 0.2s;
+    }
+
+    .cta-wa:hover {
+      background: rgba(200,255,0,0.07);
+      border-color: rgba(200,255,0,0.6);
+    }
+
+    /* FOOTER */
+    .footer {
+      margin-top: 56px;
+      padding-top: 20px;
+      border-top: 1px solid #111;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-logo {
+      font-size: 11px;
+      font-weight: 800;
+      color: #222;
+    }
+    .footer-logo span { color: var(--lima); opacity: 0.4; }
+
+    .footer-legal {
+      font-size: 10px;
+      color: #1e1e1e;
+      text-align: right;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 520px) {
+      .expect-grid { grid-template-columns: 1fr; }
+      .t-stats { grid-template-columns: 1fr 1fr; }
+      .guess-options { grid-template-columns: 1fr; }
+      .cta-final { flex-direction: column; align-items: flex-start; }
+      .footer { flex-direction: column; gap: 8px; text-align: center; }
+      .footer-legal { text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logo">Sistemas<span>conIA</span><span>.com</span></div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="badge">
+      <div class="badge-dot"></div>
+      Llamada confirmada
+    </div>
+    <h1>Tu llamada está<br><em>reservada.</em></h1>
+    <p class="hero-sub">
+      En breve recibirás la confirmación en tu correo. Nuestro equipo estará listo para ti — te mostraremos el Ecosistema en acción y valoraremos cómo puede adaptarse a tu negocio.
+    </p>
+  </section>
+
+  <!-- QUÉ VERÁS -->
+  <div class="section-label">En esta llamada</div>
+  <div class="expect-grid">
+    <div class="expect-card">
+      <span class="expect-icon">🖥️</span>
+      <h3>Ecosistema en vivo</h3>
+      <p>Verás exactamente cómo funciona el sistema trabajando en tiempo real, sin demos grabadas.</p>
+    </div>
+    <div class="expect-card">
+      <span class="expect-icon">📈</span>
+      <h3>Resultados reales</h3>
+      <p>Acceso directo a métricas y resultados actuales de negocios que ya están usando el Ecosistema.</p>
+    </div>
+    <div class="expect-card">
+      <span class="expect-icon">🎯</span>
+      <h3>Tu negocio en concreto</h3>
+      <p>Analizamos cómo encaja tu proceso comercial y qué resultados podrías esperar si decides avanzar.</p>
+    </div>
+    <div class="expect-card">
+      <span class="expect-icon">🤝</span>
+      <h3>Sin presión</h3>
+      <p>Es una llamada para que veas y preguntes todo lo que necesitas antes de tomar cualquier decisión.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- TESTIMONIOS INTERACTIVOS -->
+  <section class="testimonios-section">
+    <div class="section-label">Resultados que verás en vivo</div>
+    <div class="section-header">
+      <h2 class="section-title">¿Adivinas cuánto<br><em>creció su negocio?</em></h2>
+    </div>
+    <p class="section-sub">Los mismos resultados que mostraremos en la llamada. Desliza entre clientes.</p>
+
+    <!-- TABS -->
+    <div class="tabs" id="tabs">
+      <button class="tab active" onclick="switchTab(0)">Noble Art</button>
+      <button class="tab" onclick="switchTab(1)">Visa Homes</button>
+      <button class="tab" onclick="switchTab(2)">Holomogate</button>
+      <button class="tab" onclick="switchTab(3)">Alex PT</button>
+      <button class="tab" onclick="switchTab(4)">Momentum</button>
+    </div>
+
+    <!-- CARDS CONTAINER -->
+    <div class="testimonio-container" id="cards">
+
+      <!-- NOBLE ART -->
+      <div class="testimonio-card active" data-idx="0">
+        <div class="t-header">
+          <div class="t-negocio">
+            <div class="t-nombre">Noble Art</div>
+            <div class="t-sector">Artes marciales · Academia</div>
+          </div>
+          <div class="t-resultado-badge">
+            <div class="t-numero">×7</div>
+            <div class="t-numero-label">facturación</div>
+          </div>
+        </div>
+        <div class="t-stats">
+          <div class="t-stat">
+            <span class="t-stat-val lima">×7</span>
+            <span class="t-stat-lbl">Facturación</span>
+          </div>
+          <div class="t-stat">
+            <span class="t-stat-val">Auto</span>
+            <span class="t-stat-lbl">Gestión leads</span>
+          </div>
+          <div class="t-stat">
+            <span class="t-stat-val">14d</span>
+            <span class="t-stat-lbl">Para activar</span>
+          </div>
+        </div>
+        <div class="t-quote">
+          <p>"Nunca pensé que automatizar el proceso de captación iba a tener este impacto en la facturación. El sistema trabaja 24h y nosotros nos centramos en lo que sabemos hacer."</p>
+        </div>
+        <div class="guess-game" id="guess-0">
+          <div class="guess-label">Mini reto</div>
+          <div class="guess-question">Antes del Ecosistema, ¿cuántos leads al mes gestionaban manualmente?</div>
+          <div class="guess-options">
+            <button class="guess-btn" onclick="handleGuess(0, this, false)">Menos de 20</button>
+            <button class="guess-btn" onclick="handleGuess(0, this, true)">Entre 20 y 50</button>
+            <button class="guess-btn" onclick="handleGuess(0, this, false)">Entre 50 y 100</button>
+            <button class="guess-btn" onclick="handleGuess(0, this, false)">Más de 100</button>
+          </div>
+          <div class="guess-result" id="guess-result-0">
+            <strong>¡Correcto!</strong> Gestionaban unos 30 leads al mes a mano — con el Ecosistema, el sistema los procesa, cualifica y responde automáticamente. Sin perder ninguno.
+          </div>
+        </div>
+      </div>
+
+      <!-- VISA HOMES -->
+      <div class="testimonio-card" data-idx="1">
+        <div class="t-header">
+          <div class="t-negocio">
+            <div class="t-nombre">Visa Homes</div>
+            <div class="t-sector">Inmobiliaria · Golden Visa</div>
+          </div>
+          <div class="t-resultado-badge">
+            <div class="t-numero">+120</div>
+            <div class="t-numero-label">leads/mes</div>
+          </div>
+        </div>
+        <div class="t-stats">
+          <div class="t-stat">
+            <span class="t-stat-val lima">+120</span>
+            <span class="t-stat-lbl">Leads/mes</span>
+          </div>
+          <div class="t-stat">
+            <span class="t-stat-val">24h</span>
+            <span class="t-stat-lbl">Respuesta IA</span>
+          </div>
+          <div class="t-stat">
+            <span class="t-stat-val">3x</span>
+            <span class="t-stat-lbl">Cierre reuniones</span>
+          </div>
+        </div>
+        <div class="t-quote">
+          <p>"El mercado de Golden Visa tiene ciclos largos. Con el Ecosistema mantenemos el contacto y el interés de forma automática durante meses, hasta que el cliente está listo."</p>
+        </div>
+        <div class="guess-game" id="guess-1">
+          <div class="guess-label">Mini reto</div>
+          <div class="guess-question">¿Cuánto tardaba antes en responder a un lead de Golden Visa?</div>
+          <div class="guess-options">
+            <button class="guess-btn" onclick="handleGuess(1, this, false)">Menos de 1 hora</button>
+            <button class="guess-btn" onclick="handleGuess(1, this, false)">1–4 horas</button>
+            <button class="guess-btn" onclick="handleGuess(1, this, true)">4–24 horas</button>
+            <button class="guess-btn" onclick="handleGuess(1, this, false)">Más de 24h</button>
+          </div>
+          <div class="guess-result" id="guess-result-1">
+            <strong>¡Exacto!</strong> El equipo tardaba entre 4 y 24h en responder. Ahora el Ecosistema contesta en segundos con información personalizada, y cualifica al lead antes de que lo vea un humano.
+          </div>
+        </div>
+      </div>
+
+      <!-- HOLOMOGATE -->
+      <div class="testimonio-card" data-idx="2">
+        <div class="t-header">
+          <div class="t-negocio">
+            <div class="t-nombre">Holomogate</div>
+            <div class="t-sector">Tecnología · Holografía</div>
+          </div>
+          <div class="t-resultado-badge">
+            <div class="t-numero">×2</div>
+            <div class="t-numero-label">+ lista espera</div>
+          </div>
+        </div>
+        <div class="t-stats">
+          <div class="t-stat">
+            <span class="t-stat-val lima">×2</span>
+            <span class="t-stat-lbl">Ventas</span>
+          </div>
+          <div class="t-stat">
+            <span class="t-stat-val">Lista</span>
+            <span class="t-stat-lbl">Espera activa</span>
+          </div>
+          <div class="t-stat">
+            <span class="t-stat-val">Auto</span>
+            <span class="t-stat-lbl">Nurturing</span>
+          </div>
+        </div>
+        <div class="t-quote">
+          <p>"Tenemos lista de espera. El Ecosistema mantiene caliente a cada prospecto de forma individualizada, y cuando llega su turno ya quieren comprar."</p>
+        </div>
+        <div class="guess-game" id="guess-2">
+          <div class="guess-label">Mini reto</div>
+          <div class="guess-question">¿Qué generó la lista de espera en Holomogate?</div>
+          <div class="guess-options">
+            <button class="guess-btn" onclick="handleGuess(2, this, false)">Bajaron el precio</button>
+            <button class="guess-btn" onclick="handleGuess(2, this, true)">Automatizaron el nurturing</button>
+            <button class="guess-btn" onclick="handleGuess(2, this, false)">Lanzaron nueva web</button>
+            <button class="guess-btn" onclick="handleGuess(2, this, false)">Campaña de publicidad nueva</button>
+          </div>
+          <div class="guess-result" id="guess-result-2">
+            <strong>¡Correcto!</strong> Automatizaron el nurturing de sus prospectos. El sistema contacta, educa y mantiene el interés de cada lead de forma personalizada hasta que está listo para comprar — sin intervención humana.
+          </div>
+        </div>
+      </div>
+
+      <!-- ALEX PT -->
+      <div class="testimonio-card" data-idx="3">
+        <div class="t-header">
+          <div class="t-negocio">
+            <div class="t-nombre">Entrena con Alex</div>
+            <div class="t-sector">Fitness · Entrenamiento personal</div>
+          </div>
+          <div class="t-resultado-badge">
+            <div class="t-numero">×9</div>
+            <div class="t-numero-label">facturación</div>
+          </div>
+        </div>
+        <div class="t-stats">
+          <div class="t-stat">
+            <span class="t-stat-val lima">×9</span>
+            <span class="t-stat-lbl">Facturación</span>
+          </div>
+          <div class="t-stat">
+            <span class="t-stat-val">0h</span>
+            <span class="t-stat-lbl">Admin manual</span>
+          </div>
+          <div class="t-stat">
+            <span class="t-stat-val">100%</span>
+            <span class="t-stat-lbl">Automatizado</span>
+          </div>
+        </div>
+        <div class="t-quote">
+          <p>"Multiplicar por 9 la facturación sin contratar a nadie más. El Ecosistema hace todo el trabajo de captación y seguimiento. Yo solo entreno a mis clientes."</p>
+        </div>
+        <div class="guess-game" id="guess-3">
+          <div class="guess-label">Mini reto</div>
+          <div class="guess-question">¿Cuántas horas a la semana perdía Alex en gestión antes del Ecosistema?</div>
+          <div class="guess-options">
+            <button class="guess-btn" onclick="handleGuess(3, this, false)">Menos de 2h</button>
+            <button class="guess-btn" onclick="handleGuess(3, this, false)">2–5h</button>
+            <button class="guess-btn" onclick="handleGuess(3, this, true)">5–10h</button>
+            <button class="guess-btn" onclick="handleGuess(3, this, false)">Más de 10h</button>
+          </div>
+          <div class="guess-result" id="guess-result-3">
+            <strong>¡Acertaste!</strong> Alex dedicaba entre 5 y 10 horas semanales a responder mensajes, hacer seguimiento y gestionar leads. Con el Ecosistema, ese tiempo lo recuperó íntegro para sus clientes.
+          </div>
+        </div>
+      </div>
+
+      <!-- MOMENTUM -->
+      <div class="testimonio-card" data-idx="4">
+        <div class="t-header">
+          <div class="t-negocio">
+            <div class="t-nombre">Momentum Agency</div>
+            <div class="t-sector">Marketing · Agencia digital</div>
+          </div>
+          <div class="t-resultado-badge">
+            <div class="t-numero">+35</div>
+            <div class="t-numero-label">reuniones/mes</div>
+          </div>
+        </div>
+        <div class="t-stats">
+          <div class="t-stat">
+            <span class="t-stat-val lima">+35</span>
+            <span class="t-stat-lbl">Reuniones/mes</span>
+          </div>
+          <div class="t-stat">
+            <span class="t-stat-val">Auto</span>
+            <span class="t-stat-lbl">Prospección</span>
+          </div>
+          <div class="t-stat">
+            <span class="t-stat-val">↑3x</span>
+            <span class="t-stat-lbl">Conversión</span>
+          </div>
+        </div>
+        <div class="t-quote">
+          <p>"Antes cerrar una reunión nos costaba 3 días de seguimiento. Ahora el sistema agenda solo. Hemos triplicado las reuniones cualificadas sin aumentar el equipo comercial."</p>
+        </div>
+        <div class="guess-game" id="guess-4">
+          <div class="guess-label">Mini reto</div>
+          <div class="guess-question">¿Cuántas reuniones conseguían antes del Ecosistema?</div>
+          <div class="guess-options">
+            <button class="guess-btn" onclick="handleGuess(4, this, false)">Menos de 5/mes</button>
+            <button class="guess-btn" onclick="handleGuess(4, this, true)">8–12/mes</button>
+            <button class="guess-btn" onclick="handleGuess(4, this, false)">15–20/mes</button>
+            <button class="guess-btn" onclick="handleGuess(4, this, false)">Más de 25/mes</button>
+          </div>
+          <div class="guess-result" id="guess-result-4">
+            <strong>¡Correcto!</strong> Conseguían entre 8 y 12 reuniones al mes con un equipo dedicando horas al seguimiento manual. Con el Ecosistema pasaron a +35 reuniones cualificadas — y el equipo hace otras cosas.
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /cards -->
+
+    <!-- NAV -->
+    <div class="t-nav">
+      <button class="t-nav-btn" id="btn-prev" onclick="navigate(-1)" disabled>← Anterior</button>
+      <div class="t-dots" id="dots">
+        <div class="t-dot active" onclick="switchTab(0)"></div>
+        <div class="t-dot" onclick="switchTab(1)"></div>
+        <div class="t-dot" onclick="switchTab(2)"></div>
+        <div class="t-dot" onclick="switchTab(3)"></div>
+        <div class="t-dot" onclick="switchTab(4)"></div>
+      </div>
+      <button class="t-nav-btn" id="btn-next" onclick="navigate(1)">Siguiente →</button>
+    </div>
+
+  </section>
+
+  <!-- CTA FINAL -->
+  <div class="cta-final">
+    <div class="cta-text">
+      <h3>¿Tienes alguna pregunta antes de la llamada?</h3>
+      <p>Escríbenos directamente y te respondemos en minutos.</p>
+    </div>
+    <a href="https://wa.me/34673024992?text=Hola!%20Tengo%20una%20pregunta%20antes%20de%20la%20llamada%20de%20descubrimiento"
+       class="cta-wa">
+      💬 WhatsApp
+    </a>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-logo">Sistemas<span>conIA.com</span></div>
+    <div class="footer-legal">AI SYSTEMS ltd. · Sofia, Bulgaria · Nº 208733960</div>
+  </footer>
+
+</div>
+
+<script>
+  let current = 0;
+  const total = 5;
+  const guessAnswered = new Array(total).fill(false);
+
+  function switchTab(idx) {
+    const cards = document.querySelectorAll('.testimonio-card');
+    const tabs = document.querySelectorAll('.tab');
+    const dots = document.querySelectorAll('.t-dot');
+
+    cards[current].classList.remove('active');
+    tabs[current].classList.remove('active');
+    dots[current].classList.remove('active');
+
+    current = idx;
+
+    cards[current].classList.add('active');
+    tabs[current].classList.add('active');
+    dots[current].classList.add('active');
+
+    document.getElementById('btn-prev').disabled = current === 0;
+    document.getElementById('btn-next').disabled = current === total - 1;
+  }
+
+  function navigate(dir) {
+    const next = current + dir;
+    if (next >= 0 && next < total) switchTab(next);
+  }
+
+  function handleGuess(cardIdx, btn, isCorrect) {
+    if (guessAnswered[cardIdx]) return;
+    guessAnswered[cardIdx] = true;
+
+    const game = document.getElementById('guess-' + cardIdx);
+    const btns = game.querySelectorAll('.guess-btn');
+    const result = document.getElementById('guess-result-' + cardIdx);
+
+    btns.forEach(b => {
+      b.disabled = true;
+    });
+
+    if (isCorrect) {
+      btn.classList.add('correct');
+      result.innerHTML = result.innerHTML; // keep existing
+    } else {
+      btn.classList.add('wrong');
+      // find correct btn and highlight
+      btns.forEach(b => {
+        if (b.onclick && b.onclick.toString().includes('true')) {
+          b.classList.add('correct');
+        }
+      });
+      result.innerHTML = result.innerHTML.replace('<strong>¡Correcto!</strong>', '<strong>¡Casi!</strong>').replace('<strong>¡Acertaste!</strong>', '<strong>¡Casi!</strong>').replace('<strong>¡Exacto!</strong>', '<strong>¡Casi!</strong>');
+    }
+
+    result.classList.add('show');
+  }
+
+  // Keyboard nav
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') navigate(1);
+    if (e.key === 'ArrowLeft') navigate(-1);
+  });
+</script>
+
+</body>
+</html>
