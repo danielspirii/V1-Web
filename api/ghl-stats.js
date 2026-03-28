@@ -1,5 +1,6 @@
 // api/ghl-stats.js — Vercel Serverless Function — PRODUCCIÓN
 // SOLO LECTURA — un token por subcuenta
+// Appointments: consulta todos los calendarios de cada subcuenta
  
 const BASE = 'https://services.leadconnectorhq.com';
  
@@ -39,7 +40,7 @@ async function safeGet(url, token) {
   } catch { return null; }
 }
  
-// Suma eventos de todos los calendarios de la subcuenta en el rango
+// Suma citas de todos los calendarios en el rango
 async function getAppointments(locationId, token, range) {
   try {
     const calData   = await safeGet(`${BASE}/calendars/?locationId=${locationId}`, token);
@@ -52,7 +53,9 @@ async function getAppointments(locationId, token, range) {
           `${BASE}/calendars/events?locationId=${locationId}&calendarId=${cal.id}&startTime=${encodeURIComponent(range.start)}&endTime=${encodeURIComponent(range.end)}`,
           token
         );
-        return d?.total ?? d?.meta?.total ?? d?.events?.length ?? 0;
+        // GHL devuelve los eventos en d.events[] — contamos la longitud real
+        const fromEvents = Array.isArray(d?.events) ? d.events.length : 0;
+        return d?.total ?? d?.meta?.total ?? fromEvents;
       })
     );
     return counts.reduce((a, b) => a + b, 0);
@@ -93,11 +96,48 @@ export default async function handler(req, res) {
   const range     = req.query.range || 'today';
   const dateRange = getRange(range);
  
+  // Modo debug: muestra todos los calendarios + eventos raw de Visa Homes
+  if (req.query.debug === '1') {
+    const acc   = ACCOUNTS[0];
+    const token = process.env[acc.tokenKey];
+    const id    = acc.id;
+ 
+    const calData   = await safeGet(`${BASE}/calendars/?locationId=${id}`, token);
+    const calendars = calData?.calendars || [];
+ 
+    const calResults = await Promise.all(
+      calendars.map(async (cal) => {
+        const res2 = await fetch(
+          `${BASE}/calendars/events?locationId=${id}&calendarId=${cal.id}&startTime=${encodeURIComponent(dateRange.start)}&endTime=${encodeURIComponent(dateRange.end)}`,
+          { headers: hdrs(token) }
+        );
+        const d = await res2.json();
+        return {
+          calendarId:   cal.id,
+          calendarName: cal.name,
+          status:       res2.status,
+          total:        d?.total ?? d?.meta?.total ?? d?.events?.length ?? '?',
+          eventsCount:  Array.isArray(d?.events) ? d.events.length : '?',
+          keys:         Object.keys(d || {}),
+          sample:       JSON.stringify(d).slice(0, 300),
+        };
+      })
+    );
+ 
+    return res.status(200).json({
+      debug: true,
+      account: { id, name: acc.name },
+      dateRange,
+      calendars_count: calendars.length,
+      calendar_results: calResults,
+    });
+  }
+ 
+  // ── MODO NORMAL ──────────────────────────────────────────────────────────
   const results = await Promise.all(
     ACCOUNTS.map(acc => getAccountStats(acc, process.env[acc.tokenKey], dateRange))
   );
  
-  // Solo mostrar cuentas con al menos 1 dato > 0
   const active = results.filter(l =>
     l.newLeads > 0 || l.totalLeads > 0 || l.conversations > 0 || l.appointments > 0
   );
