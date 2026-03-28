@@ -289,7 +289,11 @@ function renderTable() {
   const sort = document.getElementById('sortSelect')?.value || sortField;
   let rows   = allData.locations.filter(l => l.name.toLowerCase().includes(q));
   rows.sort((a,b) => sort==='name' ? a.name.localeCompare(b.name) : b[sort]-a[sort]);
-  document.getElementById('clienteCount').textContent = `${rows.length} negocio${rows.length!==1?'s':''}`;
+  const totalAccounts = allData.total_accounts || allData.count || rows.length;
+  const countTxt = rows.length < totalAccounts
+    ? `${rows.length} con actividad · ${totalAccounts} total`
+    : `${rows.length} negocio${rows.length!==1?'s':''}`;
+  document.getElementById('clienteCount').textContent = countTxt;
   document.getElementById('clientesTbody').innerHTML = rows.map(loc => `
     <tr onclick="showDetalle('${loc.id}')" class="${selectedId===loc.id?'selected':''}">
       <td class="nombre">${loc.name}</td>
