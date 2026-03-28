@@ -1,7 +1,5 @@
 // api/ghl-stats.js — Vercel Serverless Function — PRODUCCIÓN
 // SOLO LECTURA — un token por subcuenta
-// Appointments = citas AGENDADAS (creadas) en el periodo
-// Ventana de consulta: 90 días atrás + 90 días adelante para no perder nada
  
 const BASE = 'https://services.leadconnectorhq.com';
  
@@ -42,32 +40,33 @@ async function safeGet(url, token) {
   } catch { return null; }
 }
  
-// Citas AGENDADAS (creadas) en el periodo
-// Consultamos ventana amplia: 90 días atrás hasta 90 días adelante
-// y filtramos por dateAdded dentro del rango solicitado
+// Citas agendadas: consultamos con timestamps en ms (que es lo que GHL acepta)
+// Ventana: 90 días atrás hasta 90 días adelante
+// Filtramos los eventos por dateAdded dentro del rango del dashboard
 async function getAppointmentsBooked(locationId, token, range) {
   try {
     const calData   = await safeGet(`${BASE}/calendars/?locationId=${locationId}`, token);
     const calendars = calData?.calendars || [];
     if (!calendars.length) return 0;
  
-    const windowStart = new Date(); windowStart.setDate(windowStart.getDate() - 90);
-    const windowEnd   = new Date(); windowEnd.setDate(windowEnd.getDate() + 90);
-    const wStart = windowStart.toISOString();
-    const wEnd   = windowEnd.toISOString();
+    const wStart = new Date(); wStart.setDate(wStart.getDate() - 90);
+    const wEnd   = new Date(); wEnd.setDate(wEnd.getDate() + 90);
+ 
+    // GHL acepta timestamps en milisegundos para este endpoint
+    const startMs = wStart.getTime();
+    const endMs   = wEnd.getTime();
  
     let total = 0;
  
     for (const cal of calendars) {
       const d = await safeGet(
-        `${BASE}/calendars/events?locationId=${locationId}&calendarId=${cal.id}&startTime=${encodeURIComponent(wStart)}&endTime=${encodeURIComponent(wEnd)}`,
+        `${BASE}/calendars/events?locationId=${locationId}&calendarId=${cal.id}&startTime=${startMs}&endTime=${endMs}`,
         token
       );
       const events = d?.events || [];
  
-      // Filtrar por la fecha en que se creó/agendó la cita
+      // Filtrar por fecha en que se agendó (dateAdded) dentro del rango solicitado
       const bookedInRange = events.filter(ev => {
-        // GHL usa dateAdded en milisegundos o ISO según el campo
         const raw = ev.dateAdded ?? ev.createdAt ?? ev.dateCreated ?? null;
         if (raw == null) return false;
         const ts = typeof raw === 'number' ? raw : new Date(raw).getTime();
@@ -115,7 +114,7 @@ export default async function handler(req, res) {
   const range     = req.query.range || 'today';
   const dateRange = getRange(range);
  
-  // Modo debug: muestra campos de fecha reales de los eventos de Visa Homes
+  // Modo debug: muestra respuesta raw con timestamps en ms
   if (req.query.debug === '1') {
     const acc   = ACCOUNTS[0];
     const token = process.env[acc.tokenKey];
@@ -124,35 +123,36 @@ export default async function handler(req, res) {
     const calData   = await safeGet(`${BASE}/calendars/?locationId=${id}`, token);
     const calendars = calData?.calendars || [];
  
-    const windowStart = new Date(); windowStart.setDate(windowStart.getDate() - 90);
-    const windowEnd   = new Date(); windowEnd.setDate(windowEnd.getDate() + 90);
+    const wStart = new Date(); wStart.setDate(wStart.getDate() - 90);
+    const wEnd   = new Date(); wEnd.setDate(wEnd.getDate() + 90);
+    const startMs = wStart.getTime();
+    const endMs   = wEnd.getTime();
  
     const calResults = await Promise.all(
       calendars.map(async (cal) => {
-        const d = await safeGet(
-          `${BASE}/calendars/events?locationId=${id}&calendarId=${cal.id}&startTime=${encodeURIComponent(windowStart.toISOString())}&endTime=${encodeURIComponent(windowEnd.toISOString())}`,
-          token
-        );
-        const events = d?.events || [];
-        const sample = events.slice(0, 2).map(ev => ({
-          title:       ev.title,
-          startTime:   ev.startTime,
-          dateAdded:   ev.dateAdded,
-          createdAt:   ev.createdAt,
-          dateCreated: ev.dateCreated,
-          dateKeys:    Object.keys(ev).filter(k => /date|creat|add/i.test(k)),
-        }));
-        const bookedInRange = events.filter(ev => {
-          const raw = ev.dateAdded ?? ev.createdAt ?? ev.dateCreated ?? null;
-          if (raw == null) return false;
-          const ts = typeof raw === 'number' ? raw : new Date(raw).getTime();
-          return ts >= dateRange.startTs && ts <= dateRange.endTs;
-        });
+        // Probar tanto con ms como con ISO para ver cuál devuelve datos
+        const [rMs, rIso] = await Promise.all([
+          fetch(`${BASE}/calendars/events?locationId=${id}&calendarId=${cal.id}&startTime=${startMs}&endTime=${endMs}`, { headers: hdrs(token) }),
+          fetch(`${BASE}/calendars/events?locationId=${id}&calendarId=${cal.id}&startTime=${encodeURIComponent(wStart.toISOString())}&endTime=${encodeURIComponent(wEnd.toISOString())}`, { headers: hdrs(token) }),
+        ]);
+        const [dMs, dIso] = await Promise.all([rMs.json(), rIso.json()]);
+ 
+        const eventsMs  = dMs?.events  || [];
+        const eventsIso = dIso?.events || [];
+ 
+        // Mostrar muestra de campos de fecha del primer evento
+        const sampleEvent = eventsMs[0] || eventsIso[0] || null;
+        const dateFields = sampleEvent
+          ? Object.entries(sampleEvent)
+              .filter(([k]) => /date|creat|add|time/i.test(k))
+              .reduce((o, [k,v]) => ({ ...o, [k]: v }), {})
+          : null;
+ 
         return {
-          calendarName:    cal.name,
-          totalEvents:     events.length,
-          bookedInRange:   bookedInRange.length,
-          sampleDateFields: sample,
+          calendarName:  cal.name,
+          withMs:        { status: rMs.status, totalEvents: eventsMs.length },
+          withIso:       { status: rIso.status, totalEvents: eventsIso.length },
+          sampleDateFields: dateFields,
         };
       })
     );
@@ -162,6 +162,8 @@ export default async function handler(req, res) {
       account: { id, name: acc.name },
       range,
       dateRange,
+      windowMs:  { start: startMs, end: endMs },
+      windowIso: { start: wStart.toISOString(), end: wEnd.toISOString() },
       calendar_results: calResults,
     });
   }
