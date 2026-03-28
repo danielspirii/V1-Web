@@ -1,6 +1,7 @@
 // api/ghl-stats.js — Vercel Serverless Function — PRODUCCIÓN
 // SOLO LECTURA — un token por subcuenta
-// Appointments: consulta todos los calendarios de cada subcuenta
+// Appointments = citas AGENDADAS (creadas) en el periodo
+// Ventana de consulta: 90 días atrás + 90 días adelante para no perder nada
  
 const BASE = 'https://services.leadconnectorhq.com';
  
@@ -27,9 +28,10 @@ function getRange(range) {
       break;
     case '7d':  start.setUTCDate(start.getUTCDate()-6);  start.setUTCHours(0,0,0,0); break;
     case '30d': start.setUTCDate(start.getUTCDate()-29); start.setUTCHours(0,0,0,0); break;
+    case '90d': start.setUTCDate(start.getUTCDate()-89); start.setUTCHours(0,0,0,0); break;
     default:    start.setUTCHours(0,0,0,0);
   }
-  return { start: start.toISOString(), end: end.toISOString(), startTs: start.getTime() };
+  return { start: start.toISOString(), end: end.toISOString(), startTs: start.getTime(), endTs: end.getTime() };
 }
  
 async function safeGet(url, token) {
@@ -40,25 +42,42 @@ async function safeGet(url, token) {
   } catch { return null; }
 }
  
-// Suma citas de todos los calendarios en el rango
-async function getAppointments(locationId, token, range) {
+// Citas AGENDADAS (creadas) en el periodo
+// Consultamos ventana amplia: 90 días atrás hasta 90 días adelante
+// y filtramos por dateAdded dentro del rango solicitado
+async function getAppointmentsBooked(locationId, token, range) {
   try {
     const calData   = await safeGet(`${BASE}/calendars/?locationId=${locationId}`, token);
     const calendars = calData?.calendars || [];
     if (!calendars.length) return 0;
  
-    const counts = await Promise.all(
-      calendars.map(async (cal) => {
-        const d = await safeGet(
-          `${BASE}/calendars/events?locationId=${locationId}&calendarId=${cal.id}&startTime=${encodeURIComponent(range.start)}&endTime=${encodeURIComponent(range.end)}`,
-          token
-        );
-        // GHL devuelve los eventos en d.events[] — contamos la longitud real
-        const fromEvents = Array.isArray(d?.events) ? d.events.length : 0;
-        return d?.total ?? d?.meta?.total ?? fromEvents;
-      })
-    );
-    return counts.reduce((a, b) => a + b, 0);
+    const windowStart = new Date(); windowStart.setDate(windowStart.getDate() - 90);
+    const windowEnd   = new Date(); windowEnd.setDate(windowEnd.getDate() + 90);
+    const wStart = windowStart.toISOString();
+    const wEnd   = windowEnd.toISOString();
+ 
+    let total = 0;
+ 
+    for (const cal of calendars) {
+      const d = await safeGet(
+        `${BASE}/calendars/events?locationId=${locationId}&calendarId=${cal.id}&startTime=${encodeURIComponent(wStart)}&endTime=${encodeURIComponent(wEnd)}`,
+        token
+      );
+      const events = d?.events || [];
+ 
+      // Filtrar por la fecha en que se creó/agendó la cita
+      const bookedInRange = events.filter(ev => {
+        // GHL usa dateAdded en milisegundos o ISO según el campo
+        const raw = ev.dateAdded ?? ev.createdAt ?? ev.dateCreated ?? null;
+        if (raw == null) return false;
+        const ts = typeof raw === 'number' ? raw : new Date(raw).getTime();
+        return ts >= range.startTs && ts <= range.endTs;
+      });
+ 
+      total += bookedInRange.length;
+    }
+ 
+    return total;
   } catch { return 0; }
 }
  
@@ -69,7 +88,7 @@ async function getAccountStats(account, token, range) {
     safeGet(`${BASE}/contacts/?locationId=${id}&limit=1`, token),
     safeGet(`${BASE}/contacts/?locationId=${id}&startDate=${encodeURIComponent(range.start)}&endDate=${encodeURIComponent(range.end)}&limit=1`, token),
     safeGet(`${BASE}/conversations/search?locationId=${id}&startAfterDate=${range.startTs}&limit=1`, token),
-    getAppointments(id, token, range),
+    getAppointmentsBooked(id, token, range),
   ]);
  
   return {
@@ -96,7 +115,7 @@ export default async function handler(req, res) {
   const range     = req.query.range || 'today';
   const dateRange = getRange(range);
  
-  // Modo debug: muestra todos los calendarios + eventos raw de Visa Homes
+  // Modo debug: muestra campos de fecha reales de los eventos de Visa Homes
   if (req.query.debug === '1') {
     const acc   = ACCOUNTS[0];
     const token = process.env[acc.tokenKey];
@@ -105,21 +124,35 @@ export default async function handler(req, res) {
     const calData   = await safeGet(`${BASE}/calendars/?locationId=${id}`, token);
     const calendars = calData?.calendars || [];
  
+    const windowStart = new Date(); windowStart.setDate(windowStart.getDate() - 90);
+    const windowEnd   = new Date(); windowEnd.setDate(windowEnd.getDate() + 90);
+ 
     const calResults = await Promise.all(
       calendars.map(async (cal) => {
-        const res2 = await fetch(
-          `${BASE}/calendars/events?locationId=${id}&calendarId=${cal.id}&startTime=${encodeURIComponent(dateRange.start)}&endTime=${encodeURIComponent(dateRange.end)}`,
-          { headers: hdrs(token) }
+        const d = await safeGet(
+          `${BASE}/calendars/events?locationId=${id}&calendarId=${cal.id}&startTime=${encodeURIComponent(windowStart.toISOString())}&endTime=${encodeURIComponent(windowEnd.toISOString())}`,
+          token
         );
-        const d = await res2.json();
+        const events = d?.events || [];
+        const sample = events.slice(0, 2).map(ev => ({
+          title:       ev.title,
+          startTime:   ev.startTime,
+          dateAdded:   ev.dateAdded,
+          createdAt:   ev.createdAt,
+          dateCreated: ev.dateCreated,
+          dateKeys:    Object.keys(ev).filter(k => /date|creat|add/i.test(k)),
+        }));
+        const bookedInRange = events.filter(ev => {
+          const raw = ev.dateAdded ?? ev.createdAt ?? ev.dateCreated ?? null;
+          if (raw == null) return false;
+          const ts = typeof raw === 'number' ? raw : new Date(raw).getTime();
+          return ts >= dateRange.startTs && ts <= dateRange.endTs;
+        });
         return {
-          calendarId:   cal.id,
-          calendarName: cal.name,
-          status:       res2.status,
-          total:        d?.total ?? d?.meta?.total ?? d?.events?.length ?? '?',
-          eventsCount:  Array.isArray(d?.events) ? d.events.length : '?',
-          keys:         Object.keys(d || {}),
-          sample:       JSON.stringify(d).slice(0, 300),
+          calendarName:    cal.name,
+          totalEvents:     events.length,
+          bookedInRange:   bookedInRange.length,
+          sampleDateFields: sample,
         };
       })
     );
@@ -127,8 +160,8 @@ export default async function handler(req, res) {
     return res.status(200).json({
       debug: true,
       account: { id, name: acc.name },
+      range,
       dateRange,
-      calendars_count: calendars.length,
       calendar_results: calResults,
     });
   }
