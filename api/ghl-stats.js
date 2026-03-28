@@ -1,6 +1,5 @@
 // api/ghl-stats.js — Vercel Serverless Function
 // SOLO LECTURA — un token por subcuenta
-// contacts ✅  conversations ✅  calendars/events ✅ (con calendarId)
  
 const BASE = 'https://services.leadconnectorhq.com';
  
@@ -40,19 +39,18 @@ async function safeGet(url, token) {
   } catch { return null; }
 }
  
-// Obtener todos los calendarios de una subcuenta y sumar sus eventos en el rango
+// Obtener citas: primero lista calendarios, luego suma eventos de cada uno
+// Sin parámetro "limit" que GHL no acepta en este endpoint
 async function getAppointments(locationId, token, range) {
   try {
-    // 1. Obtener lista de calendarios de la subcuenta
     const calData = await safeGet(`${BASE}/calendars/?locationId=${locationId}`, token);
     const calendars = calData?.calendars || [];
     if (!calendars.length) return 0;
  
-    // 2. Para cada calendario, obtener eventos en el rango
     const counts = await Promise.all(
       calendars.map(async (cal) => {
         const d = await safeGet(
-          `${BASE}/calendars/events?locationId=${locationId}&calendarId=${cal.id}&startTime=${encodeURIComponent(range.start)}&endTime=${encodeURIComponent(range.end)}&limit=100`,
+          `${BASE}/calendars/events?locationId=${locationId}&calendarId=${cal.id}&startTime=${encodeURIComponent(range.start)}&endTime=${encodeURIComponent(range.end)}`,
           token
         );
         return d?.total ?? d?.meta?.total ?? d?.events?.length ?? 0;
@@ -96,29 +94,32 @@ export default async function handler(req, res) {
   const range     = req.query.range || 'today';
   const dateRange = getRange(range);
  
-  // Modo debug — prueba Visa Homes SistemOS con respuestas raw
+  // Modo debug: respuestas raw de Visa Homes SistemOS
   if (req.query.debug === '1') {
     const acc   = ACCOUNTS[0];
     const token = process.env[acc.tokenKey];
     const id    = acc.id;
  
-    const calData = await safeGet(`${BASE}/calendars/?locationId=${id}`, token);
+    const calData   = await safeGet(`${BASE}/calendars/?locationId=${id}`, token);
     const calendars = calData?.calendars || [];
-    const firstCal  = calendars[0];
  
-    const [r1, r2, r3, r4] = await Promise.all([
+    // Probar el primer calendario SIN limit
+    let calEventsResult = null;
+    if (calendars[0]) {
+      const r = await fetch(
+        `${BASE}/calendars/events?locationId=${id}&calendarId=${calendars[0].id}&startTime=${encodeURIComponent(dateRange.start)}&endTime=${encodeURIComponent(dateRange.end)}`,
+        { headers: hdrs(token) }
+      );
+      const d = await r.json();
+      calEventsResult = { status: r.status, calendarId: calendars[0].id, calendarName: calendars[0].name, total: d?.total ?? d?.meta?.total ?? d?.events?.length ?? '?', sample: JSON.stringify(d).slice(0, 400) };
+    }
+ 
+    const [r1, r2, r3] = await Promise.all([
       fetch(`${BASE}/contacts/?locationId=${id}&limit=1`, { headers: hdrs(token) }),
       fetch(`${BASE}/contacts/?locationId=${id}&startDate=${encodeURIComponent(dateRange.start)}&endDate=${encodeURIComponent(dateRange.end)}&limit=1`, { headers: hdrs(token) }),
       fetch(`${BASE}/conversations/search?locationId=${id}&startAfterDate=${dateRange.startTs}&limit=1`, { headers: hdrs(token) }),
-      firstCal
-        ? fetch(`${BASE}/calendars/events?locationId=${id}&calendarId=${firstCal.id}&startTime=${encodeURIComponent(dateRange.start)}&endTime=${encodeURIComponent(dateRange.end)}&limit=100`, { headers: hdrs(token) })
-        : Promise.resolve(null),
     ]);
- 
-    const [d1, d2, d3, d4] = await Promise.all([
-      r1.json(), r2.json(), r3.json(),
-      r4 ? r4.json() : null,
-    ]);
+    const [d1, d2, d3] = await Promise.all([r1.json(), r2.json(), r3.json()]);
  
     return res.status(200).json({
       debug: true,
@@ -126,10 +127,10 @@ export default async function handler(req, res) {
       dateRange,
       calendars: calendars.map(c => ({ id: c.id, name: c.name })),
       results: {
-        contacts_total:  { status: r1.status, total: d1?.total ?? d1?.meta?.total ?? '?', sample: JSON.stringify(d1).slice(0,300) },
-        contacts_new:    { status: r2.status, total: d2?.total ?? d2?.meta?.total ?? '?', sample: JSON.stringify(d2).slice(0,300) },
-        conversations:   { status: r3.status, total: d3?.total ?? d3?.meta?.total ?? '?', sample: JSON.stringify(d3).slice(0,300) },
-        calendar_events: r4 ? { status: r4.status, calendarId: firstCal?.id, total: d4?.total ?? d4?.meta?.total ?? d4?.events?.length ?? '?', sample: JSON.stringify(d4).slice(0,300) } : { error: 'no calendars found' },
+        contacts_total:  { status: r1.status, total: d1?.total ?? d1?.meta?.total ?? '?', sample: JSON.stringify(d1).slice(0,200) },
+        contacts_new:    { status: r2.status, total: d2?.total ?? d2?.meta?.total ?? '?', sample: JSON.stringify(d2).slice(0,200) },
+        conversations:   { status: r3.status, total: d3?.total ?? d3?.meta?.total ?? '?', sample: JSON.stringify(d3).slice(0,200) },
+        calendar_events: calEventsResult || { error: 'no calendars found' },
       }
     });
   }
@@ -139,7 +140,6 @@ export default async function handler(req, res) {
     ACCOUNTS.map(acc => getAccountStats(acc, process.env[acc.tokenKey], dateRange))
   );
  
-  // Solo mostrar cuentas con al menos 1 dato > 0
   const active = results.filter(l =>
     l.newLeads > 0 || l.totalLeads > 0 || l.conversations > 0 || l.appointments > 0
   );
