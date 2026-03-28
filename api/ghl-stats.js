@@ -1,5 +1,7 @@
-// api/ghl-stats.js — Vercel Serverless Function — PRODUCCIÓN
+// api/ghl-stats.js — Vercel Serverless Function — PRODUCCIÓN FINAL
 // SOLO LECTURA — un token por subcuenta
+// ✅ Calendar events: timestamps en milisegundos (ISO devuelve siempre 0)
+// ✅ Appointments = citas AGENDADAS (dateAdded) en el periodo, no cuándo ocurren
  
 const BASE = 'https://services.leadconnectorhq.com';
  
@@ -40,40 +42,36 @@ async function safeGet(url, token) {
   } catch { return null; }
 }
  
-// Citas agendadas: consultamos con timestamps en ms (que es lo que GHL acepta)
-// Ventana: 90 días atrás hasta 90 días adelante
-// Filtramos los eventos por dateAdded dentro del rango del dashboard
+// Citas AGENDADAS en el periodo (dateAdded dentro del rango)
+// ✅ Usa timestamps en ms para startTime/endTime — ISO siempre devuelve 0
+// ✅ Ventana amplia: 90 días atrás + 90 días adelante
 async function getAppointmentsBooked(locationId, token, range) {
   try {
     const calData   = await safeGet(`${BASE}/calendars/?locationId=${locationId}`, token);
     const calendars = calData?.calendars || [];
     if (!calendars.length) return 0;
  
-    const wStart = new Date(); wStart.setDate(wStart.getDate() - 90);
-    const wEnd   = new Date(); wEnd.setDate(wEnd.getDate() + 90);
- 
-    // GHL acepta timestamps en milisegundos para este endpoint
-    const startMs = wStart.getTime();
-    const endMs   = wEnd.getTime();
+    // Ventana amplia en milisegundos (lo que acepta GHL)
+    const wStartMs = Date.now() - 90 * 24 * 60 * 60 * 1000;
+    const wEndMs   = Date.now() + 90 * 24 * 60 * 60 * 1000;
  
     let total = 0;
  
     for (const cal of calendars) {
       const d = await safeGet(
-        `${BASE}/calendars/events?locationId=${locationId}&calendarId=${cal.id}&startTime=${startMs}&endTime=${endMs}`,
+        `${BASE}/calendars/events?locationId=${locationId}&calendarId=${cal.id}&startTime=${wStartMs}&endTime=${wEndMs}`,
         token
       );
       const events = d?.events || [];
  
-      // Filtrar por fecha en que se agendó (dateAdded) dentro del rango solicitado
-      const bookedInRange = events.filter(ev => {
-        const raw = ev.dateAdded ?? ev.createdAt ?? ev.dateCreated ?? null;
-        if (raw == null) return false;
-        const ts = typeof raw === 'number' ? raw : new Date(raw).getTime();
+      // Filtrar por dateAdded (cuándo se agendó) dentro del rango del dashboard
+      const booked = events.filter(ev => {
+        if (!ev.dateAdded) return false;
+        const ts = new Date(ev.dateAdded).getTime();
         return ts >= range.startTs && ts <= range.endTs;
       });
  
-      total += bookedInRange.length;
+      total += booked.length;
     }
  
     return total;
@@ -114,65 +112,11 @@ export default async function handler(req, res) {
   const range     = req.query.range || 'today';
   const dateRange = getRange(range);
  
-  // Modo debug: muestra respuesta raw con timestamps en ms
-  if (req.query.debug === '1') {
-    const acc   = ACCOUNTS[0];
-    const token = process.env[acc.tokenKey];
-    const id    = acc.id;
- 
-    const calData   = await safeGet(`${BASE}/calendars/?locationId=${id}`, token);
-    const calendars = calData?.calendars || [];
- 
-    const wStart = new Date(); wStart.setDate(wStart.getDate() - 90);
-    const wEnd   = new Date(); wEnd.setDate(wEnd.getDate() + 90);
-    const startMs = wStart.getTime();
-    const endMs   = wEnd.getTime();
- 
-    const calResults = await Promise.all(
-      calendars.map(async (cal) => {
-        // Probar tanto con ms como con ISO para ver cuál devuelve datos
-        const [rMs, rIso] = await Promise.all([
-          fetch(`${BASE}/calendars/events?locationId=${id}&calendarId=${cal.id}&startTime=${startMs}&endTime=${endMs}`, { headers: hdrs(token) }),
-          fetch(`${BASE}/calendars/events?locationId=${id}&calendarId=${cal.id}&startTime=${encodeURIComponent(wStart.toISOString())}&endTime=${encodeURIComponent(wEnd.toISOString())}`, { headers: hdrs(token) }),
-        ]);
-        const [dMs, dIso] = await Promise.all([rMs.json(), rIso.json()]);
- 
-        const eventsMs  = dMs?.events  || [];
-        const eventsIso = dIso?.events || [];
- 
-        // Mostrar muestra de campos de fecha del primer evento
-        const sampleEvent = eventsMs[0] || eventsIso[0] || null;
-        const dateFields = sampleEvent
-          ? Object.entries(sampleEvent)
-              .filter(([k]) => /date|creat|add|time/i.test(k))
-              .reduce((o, [k,v]) => ({ ...o, [k]: v }), {})
-          : null;
- 
-        return {
-          calendarName:  cal.name,
-          withMs:        { status: rMs.status, totalEvents: eventsMs.length },
-          withIso:       { status: rIso.status, totalEvents: eventsIso.length },
-          sampleDateFields: dateFields,
-        };
-      })
-    );
- 
-    return res.status(200).json({
-      debug: true,
-      account: { id, name: acc.name },
-      range,
-      dateRange,
-      windowMs:  { start: startMs, end: endMs },
-      windowIso: { start: wStart.toISOString(), end: wEnd.toISOString() },
-      calendar_results: calResults,
-    });
-  }
- 
-  // ── MODO NORMAL ──────────────────────────────────────────────────────────
   const results = await Promise.all(
     ACCOUNTS.map(acc => getAccountStats(acc, process.env[acc.tokenKey], dateRange))
   );
  
+  // Solo mostrar cuentas con al menos 1 dato > 0
   const active = results.filter(l =>
     l.newLeads > 0 || l.totalLeads > 0 || l.conversations > 0 || l.appointments > 0
   );
