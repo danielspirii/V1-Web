@@ -139,6 +139,7 @@ td.numero.dim{color:#333;}
     <button class="range-btn" onclick="setRange('yesterday',this)">Ayer</button>
     <button class="range-btn" onclick="setRange('7d',this)">Últimos 7 días</button>
     <button class="range-btn" onclick="setRange('30d',this)">Últimos 30 días</button>
+    <button class="range-btn" onclick="setRange('90d',this)">Últimos 90 días</button>
   </div>
  
   <div class="range-label" id="rangeLabel">Mostrando: Hoy</div>
@@ -218,6 +219,7 @@ const rangeLabels = {
   yesterday: 'Mostrando: Ayer',
   '7d':      'Mostrando: Últimos 7 días',
   '30d':     'Mostrando: Últimos 30 días',
+  '90d':     'Mostrando: Últimos 90 días',
 };
  
 const rangePeriodLabel = {
@@ -225,6 +227,7 @@ const rangePeriodLabel = {
   yesterday: 'ayer',
   '7d':      '7 días',
   '30d':     '30 días',
+  '90d':     '90 días',
 };
  
 function setRange(range, btn) {
