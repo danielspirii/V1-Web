@@ -11,6 +11,7 @@ const ACCOUNTS = [
   { id: 'XOBCJ5KymRycK5c2VXvu', name: 'Tecnologia GenApp',       tokenKey: 'GHL_TOKEN_3' },
   { id: '6B2xSfU4hLqCz3D0w31W', name: 'Noble Art Official Corp', tokenKey: 'GHL_TOKEN_4' },
   { id: 'HGwisOoHBMos8Tyrm7Ve', name: 'FondeateLab',             tokenKey: 'GHL_TOKEN_5' },
+  { id: 'tma7PbfJAfbvQTysMKEU', name: 'Noble Art',               tokenKey: 'GHL_TOKEN_6' },
 ];
  
 function hdrs(token) {
